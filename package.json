@@ -12,11 +12,13 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.11.0",
     "mongoose": "^8.8.3",
+    "mysql2": "^3.20.0",
     "nanoid": "^3.3.8",
     "picocolors": "^1.1.1",
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "rollup": "^4.28.0",
+    "sequelize": "^6.37.8",
     "source-map-js": "^1.2.1",
     "vite": "^5.4.11"
   },
