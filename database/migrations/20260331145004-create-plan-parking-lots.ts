@@ -2,55 +2,71 @@ import { QueryInterface, DataTypes } from "sequelize";
 
 module.exports = {
   async up(queryInterface: QueryInterface) {
-    await queryInterface.createTable("users", {
+    await queryInterface.createTable("plan_parking_lots", {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false,
       },
-      firstName: {
-        type: DataTypes.STRING,
+
+      planId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "plans",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
-      lastName: {
-        type: DataTypes.STRING,
+
+      parkingLotId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
+        references: {
+          model: "parking_lots",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
       },
-      password: {
-        type: DataTypes.STRING,
+
+      status: {
+        type: DataTypes.ENUM("ACTIVE", "SUSPENDED"),
         allowNull: false,
-      },
-      phone: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      accountStatus: {
-        type: DataTypes.ENUM("ACTIVE", "SUSPENDED", "DELETED"),
         defaultValue: "ACTIVE",
       },
-      role: {
-        type: DataTypes.ENUM("ADMIN", "CLIENT", "EMPLOYEE"),
-        defaultValue: "CLIENT",
-      },
-      CIN: {
-        type: DataTypes.STRING,
+
+      renewFee: {
+        type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
       },
+
+      subscriptionFee: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: false,
+      },
+
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
+
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
     });
+
+
   },
 
   async down(queryInterface: QueryInterface) {
-    await queryInterface.dropTable("users");
+    await queryInterface.dropTable("plan_parking_lots");
+
+
   },
 };

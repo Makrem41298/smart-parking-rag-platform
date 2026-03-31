@@ -12,6 +12,8 @@ export interface ReservationAttributes {
     userId: number;
     totalPrice: number;
     status: ReservationStatus;
+    entryTime: Date | null;
+    leaveTime: Date | null;
 }
 
 export interface CreateReservationAttributes
@@ -28,6 +30,8 @@ export class Reservation
     declare endTimeDate: Date;
     declare totalPrice: number;
     declare status: ReservationStatus;
+    declare entryTime: Date;
+    declare leaveTime: Date;
 }
 
 export const initReservation = (sequelize: Sequelize): void => {
@@ -75,6 +79,15 @@ export const initReservation = (sequelize: Sequelize): void => {
                 allowNull: false,
                 defaultValue: ReservationStatus.REQUESTED,
             },
+            entryTime: {
+                type: DataTypes.DATE,
+                allowNull: true,
+            },
+            leaveTime: {
+                type: DataTypes.DATE,
+                allowNull: true,
+            }
+
         },
         {
             sequelize,
@@ -86,9 +99,15 @@ export const initReservation = (sequelize: Sequelize): void => {
 };
 
 
-Reservation.belongsTo(User)
-Reservation.belongsTo(ParkingLots)
+Reservation.belongsTo(User, {
+    foreignKey: "userId",
+    as: "user"
+});
 
+Reservation.belongsTo(ParkingLots, {
+    foreignKey: "parkingLotId",
+    as: "parkingLot"
+});
 Reservation.hasMany(PaymentTransaction,{
     foreignKey: "paymentableId",
     constraints: false,

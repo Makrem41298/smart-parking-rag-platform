@@ -30,7 +30,7 @@ export enum ReservationStatus {
     USED= "USED",
 }
 export enum PaymentStatus {
-    ACTIVE= "ACTIVE",
-    REFUSED= "REFUSED",
+    ACTIVE= "SUCCESS",
+    REFUSED= "FAILED",
     PENDING= "PENDING",
 }

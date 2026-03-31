@@ -8,6 +8,7 @@ export interface UserAttributes {
     id: number;
     firstName: string;
     lastName: string;
+    email: string;
     password: string;
     phone: string;
     accountStatus: AccountStatus;
@@ -23,6 +24,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
     declare id: number;
     declare firstName: string;
     declare lastName: string;
+    declare email: string;
     declare password: string;
     declare phone: string;
     declare accountStatus: AccountStatus;
@@ -48,6 +50,12 @@ export const initUserModel = (sequelize: Sequelize) => {
                 type: DataTypes.STRING,
                 allowNull: false,
             },
+            email: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                unique: true,
+            },
+
             password: {
                 type: DataTypes.STRING,
                 allowNull: false,
