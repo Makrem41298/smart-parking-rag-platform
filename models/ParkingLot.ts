@@ -133,10 +133,18 @@ export const initParkingLotModel = (sequelize: Sequelize): void => {
 
 ParkingLots.hasMany(Reservation, {
     foreignKey: "parkingLotId",
-    as: "parkingLots",
+    as: "reservations",
 });
 
 
-ParkingLots.belongsToMany(Plan,{through:PlanParkingLot})
-ParkingLots.belongsTo(TarifGrid)
+ParkingLots.belongsToMany(Plan, {
+    through: PlanParkingLot,
+    foreignKey: "parkingLotId",
+    otherKey: "planId",
+    as: "plans",
+});
 
+ParkingLots.belongsTo(TarifGrid, {
+    foreignKey: "tarifGridId",
+    as: "tarifGrid",
+});
