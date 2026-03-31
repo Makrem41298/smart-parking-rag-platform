@@ -1,4 +1,5 @@
 import { Sequelize, DataTypes, Model, Optional } from "sequelize";
+import {PaymentTransaction} from "./PaymentTransaction";
 
 export interface InvoiceAttributes {
     id: number;
@@ -45,6 +46,8 @@ export const initInvoice = (sequelize: Sequelize): void => {
             paymentTranslationId: {
                 type:DataTypes.INTEGER,
                 allowNull: false,
+                unique: true, // 🔥 IMPORTANT for 1:1
+
                 references: {
                     model: 'payment_transactions',
                     key: 'id',
@@ -59,3 +62,8 @@ export const initInvoice = (sequelize: Sequelize): void => {
         }
     );
 };
+
+Invoice.belongsTo(PaymentTransaction, {
+    foreignKey: "paymentTransactionId",
+    as: "paymentTransaction",
+});

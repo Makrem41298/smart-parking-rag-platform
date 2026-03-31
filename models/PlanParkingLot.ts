@@ -2,6 +2,8 @@ import {Sequelize, DataTypes, Model, Optional, ForeignKey} from "sequelize";
 import { PlanStatus } from "./EnumType";
 import {ParkingLots} from "./ParkingLot";
 import {Plan} from "./Plan";
+import {User} from "./User";
+import {Subscription} from "./Subscription";
 
 export interface PlanParkingLotAttributes {
     id: number;
@@ -78,3 +80,6 @@ export const initPlanParkingLot = (sequelize: Sequelize): void => {
         }
     );
 };
+
+
+PlanParkingLot.belongsToMany(User,{through:Subscription})

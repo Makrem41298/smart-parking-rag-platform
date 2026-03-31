@@ -1,4 +1,5 @@
 import { Sequelize, DataTypes, Optional, Model } from "sequelize";
+import {ParkingLots} from "./ParkingLot";
 
 export interface TarifGridItem {
     minutes: number;
@@ -48,3 +49,6 @@ export const initTarifGrid = (sequelize: Sequelize): void => {
         }
     );
 };
+
+
+TarifGrid.hasMany(ParkingLots)

@@ -1,6 +1,10 @@
 import { DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
 import { ParkingStatus } from "./EnumType";
 import { TarifGrid } from "./TarifGrid";
+import {Reservation} from "./Reservation";
+import {User} from "./User";
+import {Plan} from "./Plan";
+import {PlanParkingLot} from "./PlanParkingLot";
 
 export interface ParkingLotAttributes {
     id: number;
@@ -125,3 +129,14 @@ export const initParkingLotModel = (sequelize: Sequelize): void => {
         }
     );
 };
+
+
+ParkingLots.hasMany(Reservation, {
+    foreignKey: "parkingLotId",
+    as: "parkingLots",
+});
+
+
+ParkingLots.belongsToMany(Plan,{through:PlanParkingLot})
+ParkingLots.belongsTo(TarifGrid)
+

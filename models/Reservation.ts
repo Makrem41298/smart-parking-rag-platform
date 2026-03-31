@@ -2,6 +2,7 @@ import { Model, Optional, DataTypes, Sequelize, ForeignKey } from "sequelize";
 import { ReservationStatus } from "./EnumType";
 import { ParkingLots } from "./ParkingLot";
 import { User } from "./User";
+import {PaymentTransaction} from "./PaymentTransaction";
 
 export interface ReservationAttributes {
     id: number;
@@ -83,3 +84,16 @@ export const initReservation = (sequelize: Sequelize): void => {
         }
     );
 };
+
+
+Reservation.belongsTo(User)
+Reservation.belongsTo(ParkingLots)
+
+Reservation.hasMany(PaymentTransaction,{
+    foreignKey: "paymentableId",
+    constraints: false,
+    scope:{
+        paymentableType:'reservation',
+
+    }
+})

@@ -2,6 +2,8 @@ import {Sequelize, DataTypes, Model, Optional, ForeignKey} from "sequelize";
 import {User} from "./User";
 import {PlanParkingLot} from "./PlanParkingLot";
 import {SubscriptionStatus} from "./EnumType";
+import {PaymentTransaction} from "./PaymentTransaction";
+import {Reservation} from "./Reservation";
 
 interface SubscriptionAttributes {
     id: number;
@@ -78,3 +80,13 @@ export const initSubscription = (sequelize: Sequelize): void => {
         }
     );
 };
+
+
+Subscription.hasMany(PaymentTransaction,{
+    foreignKey: "paymentableId",
+    constraints: false,
+    scope:{
+        paymentableType:'subscription',
+
+    }
+})

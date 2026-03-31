@@ -1,5 +1,8 @@
 import { Model, Optional, DataTypes, Sequelize } from "sequelize";
 import { PaymentStatus } from "./EnumType";
+import {Invoice} from "./Invoice";
+import {Reservation} from "./Reservation";
+import {Subscription} from "./Subscription";
 
 export interface PaymentTransactionAttributes {
     id: number;
@@ -79,3 +82,8 @@ export const initPaymentTransaction = (sequelize: Sequelize): void => {
         }
     );
 };
+PaymentTransaction.hasOne(Invoice, {
+    foreignKey: "paymentTransactionId",
+    as: "invoice",
+});PaymentTransaction.belongsTo(Reservation, { foreignKey: 'paymentableId', constraints: false });
+PaymentTransaction.belongsTo(Subscription, { foreignKey: 'paymentableId', constraints: false });

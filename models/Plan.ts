@@ -1,4 +1,6 @@
 import { Sequelize, Model, DataTypes, Optional } from "sequelize";
+import {PlanParkingLot} from "./PlanParkingLot";
+import {ParkingLots} from "./ParkingLot";
 
 export interface ActiveDay {
     day: string;
@@ -61,3 +63,5 @@ export const initPlan = (sequelize: Sequelize): void => {
         }
     );
 };
+
+Plan.belongsToMany(ParkingLots,{through:PlanParkingLot})

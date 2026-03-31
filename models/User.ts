@@ -1,5 +1,8 @@
-import { DataTypes, Model, Optional, Sequelize } from "sequelize";
+import {DataTypes, HasMany, Model, Optional, Sequelize} from "sequelize";
 import { Role, AccountStatus } from "./EnumType";
+import {Reservation} from "./Reservation";
+import {PlanParkingLot} from "./PlanParkingLot";
+import {Subscription} from "./Subscription";
 
 export interface UserAttributes {
     id: number;
@@ -25,6 +28,8 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
     declare accountStatus: AccountStatus;
     declare role: Role;
     declare CIN: string;
+
+
 }
 
 export const initUserModel = (sequelize: Sequelize) => {
@@ -74,3 +79,13 @@ export const initUserModel = (sequelize: Sequelize) => {
         }
     );
 };
+
+
+
+User.hasMany(Reservation, {
+    foreignKey: "userId",
+    as: "reservations",
+});
+
+User.belongsToMany(PlanParkingLot,{through:Subscription})
+
