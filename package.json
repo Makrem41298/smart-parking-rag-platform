@@ -19,12 +19,15 @@
     "prettier": "^3.4.2",
     "rollup": "^4.28.0",
     "sequelize": "^6.37.8",
+    "sequelize-typescript": "^2.1.6",
     "source-map-js": "^1.2.1",
+    "ts-node": "^10.9.2",
     "vite": "^5.4.11"
   },
   "scripts": {
     "start": "node app.ts",
-    "dev": "nodemon app.ts"
+    "dev": "nodemon app.ts",
+    "migrate": "node -r ts-node/register ./node_modules/sequelize-cli/lib/sequelize db:migrate"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +37,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.0",
     "nodemon": "^3.1.7",
+    "sequelize-cli": "^6.6.5",
     "ts-node-dev": "^2.0.0",
     "typescript": "^6.0.2"
   }

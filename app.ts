@@ -42,7 +42,7 @@ async function startServer() {
             console.log(`Server is running on port ${port}`);
         });
     } catch (error) {
-        console.error("Unable to connect to the database:", error);
+        console.error("Unable to connect :", error);
     }
 }
 
