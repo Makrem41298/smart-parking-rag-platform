@@ -98,21 +98,3 @@ export const initReservation = (sequelize: Sequelize): void => {
     );
 };
 
-
-Reservation.belongsTo(User, {
-    foreignKey: "userId",
-    as: "user"
-});
-
-Reservation.belongsTo(ParkingLots, {
-    foreignKey: "parkingLotId",
-    as: "parkingLot"
-});
-Reservation.hasMany(PaymentTransaction,{
-    foreignKey: "paymentableId",
-    constraints: false,
-    scope:{
-        paymentableType:'reservation',
-
-    }
-})

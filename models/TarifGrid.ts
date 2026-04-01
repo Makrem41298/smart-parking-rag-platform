@@ -51,4 +51,3 @@ export const initTarifGrid = (sequelize: Sequelize): void => {
 };
 
 
-TarifGrid.hasMany(ParkingLots)

@@ -129,22 +129,3 @@ export const initParkingLotModel = (sequelize: Sequelize): void => {
         }
     );
 };
-
-
-ParkingLots.hasMany(Reservation, {
-    foreignKey: "parkingLotId",
-    as: "reservations",
-});
-
-
-ParkingLots.belongsToMany(Plan, {
-    through: PlanParkingLot,
-    foreignKey: "parkingLotId",
-    otherKey: "planId",
-    as: "plans",
-});
-
-ParkingLots.belongsTo(TarifGrid, {
-    foreignKey: "tarifGridId",
-    as: "tarifGrid",
-});

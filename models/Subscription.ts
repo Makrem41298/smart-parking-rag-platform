@@ -81,12 +81,3 @@ export const initSubscription = (sequelize: Sequelize): void => {
     );
 };
 
-
-Subscription.hasMany(PaymentTransaction,{
-    foreignKey: "paymentableId",
-    constraints: false,
-    scope:{
-        paymentableType:'subscription',
-
-    }
-})

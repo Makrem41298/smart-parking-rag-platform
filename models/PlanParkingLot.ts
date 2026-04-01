@@ -82,4 +82,3 @@ export const initPlanParkingLot = (sequelize: Sequelize): void => {
 };
 
 
-PlanParkingLot.belongsToMany(User,{through:Subscription})

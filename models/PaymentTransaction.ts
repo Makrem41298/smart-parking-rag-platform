@@ -82,8 +82,3 @@ export const initPaymentTransaction = (sequelize: Sequelize): void => {
         }
     );
 };
-PaymentTransaction.hasOne(Invoice, {
-    foreignKey: "paymentTransactionId",
-    as: "invoice",
-});PaymentTransaction.belongsTo(Reservation, { foreignKey: 'paymentableId', constraints: false });
-PaymentTransaction.belongsTo(Subscription, { foreignKey: 'paymentableId', constraints: false });
