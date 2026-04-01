@@ -1,10 +1,9 @@
 import dotenv from "dotenv";
 import express, { Application } from "express";
-import authRoutes from "./routes/api";
-import { Sequelize } from "sequelize";
+import routes from "./routes/api";
+import sequelize  from "./models/index";
 
 dotenv.config();
-
 const app: Application = express();
 
 app.use(express.json());
@@ -20,12 +19,7 @@ console.log("DATABASE_PASSWORD =", process.env.DATABASE_PASSWORD);
 console.log("DATABASE_CONNECTION=", process.env.DATABASE_CONNEXTION);
 
 
-const sequelize = new Sequelize(String(process.env.DATABASE_NAME), String(process.env.DATABASE_USERNAME), String(process.env.DATABASE_PASSWORD), {
-    host: process.env.DATABASE_HOST,
-    port:Number(process.env.DATABASE_PORT) ,
-    // @ts-ignore
-    dialect: String(process.env.DATABASE_CONNEXTION)
-});
+
 
 async function startServer() {
     try {
@@ -37,7 +31,7 @@ async function startServer() {
 
         await sequelize.sync();
         console.log("✅ Database synced");
-        authRoutes(app);
+        routes(app);
         app.listen(port, () => {
             console.log(`Server is running on port ${port}`);
         });

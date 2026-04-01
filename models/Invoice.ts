@@ -63,7 +63,3 @@ export const initInvoice = (sequelize: Sequelize): void => {
     );
 };
 
-Invoice.belongsTo(PaymentTransaction, {
-    foreignKey: "paymentTransactionId",
-    as: "paymentTransaction",
-});

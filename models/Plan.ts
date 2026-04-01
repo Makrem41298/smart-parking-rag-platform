@@ -64,4 +64,3 @@ export const initPlan = (sequelize: Sequelize): void => {
     );
 };
 
-Plan.belongsToMany(ParkingLots,{through:PlanParkingLot})

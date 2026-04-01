@@ -89,11 +89,3 @@ export const initUserModel = (sequelize: Sequelize) => {
 };
 
 
-
-User.hasMany(Reservation, {
-    foreignKey: "userId",
-    as: "reservations",
-});
-
-User.belongsToMany(PlanParkingLot,{through:Subscription})
-
