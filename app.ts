@@ -11,12 +11,12 @@ app.use(express.urlencoded({ extended: true }));
 
 const port: number = Number(process.env.PORT) || 3000;
 
-console.log("DATABASE_URL =", process.env.DATABASE_HOST);
-console.log("DATABASE_PORT =", process.env.DATABASE_PORT);
-console.log("DATABASE_NAME =", process.env.DATABASE_NAME);
-console.log("DATABASE_USERNAME =", process.env.DATABASE_USERNAME);
-console.log("DATABASE_PASSWORD =", process.env.DATABASE_PASSWORD);
-console.log("DATABASE_CONNECTION=", process.env.DATABASE_CONNEXTION);
+console.log("DATABASE_URL =", process.env.DB_HOST);
+console.log("DATABASE_PORT =", process.env.DB_PORT);
+console.log("DATABASE_NAME =", process.env.DB_NAME);
+console.log("DATABASE_USERNAME =", process.env.DB_USER);
+console.log("DATABASE_PASSWORD =", process.env.DB_PASSWORD);
+console.log("DATABASE_CONNECTION=", process.env.DB_DIALECT);
 
 
 

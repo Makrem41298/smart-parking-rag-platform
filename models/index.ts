@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
-import config from "../config/config.json";
+// @ts-ignore
+import config from "../config/config.js";
 import {initUserModel, User} from "./User";
 import {initInvoice, Invoice} from "./Invoice";
 import {initPaymentTransaction, PaymentTransaction} from "./PaymentTransaction";
