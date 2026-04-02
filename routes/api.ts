@@ -15,6 +15,7 @@ import {
     getParkingLotById,
     updateParkingLot
 } from "../controllers/parkingLot.controller";
+import {getAllUsers, getUserById, updateUser} from "../controllers/user.controller";
 
 
 export default function routes(app: Application): void {
@@ -50,5 +51,8 @@ export default function routes(app: Application): void {
     app.delete("/parking-lot/:id", deleteParkingLot);
 
 
-
+//users
+    app.get("/users", getAllUsers);
+    app.get("/users/:id", getUserById);
+    app.put("/users/:id", updateUser);
 }
