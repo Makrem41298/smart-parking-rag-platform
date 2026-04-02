@@ -55,11 +55,13 @@ module.exports = {
       entryTime:{
         type: DataTypes.DATE,
         allowNull: true,
+        defaultValue:null
       }
       ,
-      endTime: {
+      leaveTime: {
         type: DataTypes.DATE,
         allowNull: true,
+        defaultValue:null
       },
 
 

@@ -68,6 +68,7 @@ PlanParkingLotModel.belongsToMany(UserModel,{through:SubscriptionModel})
 ReservationModel.belongsTo(UserModel, {
     foreignKey: "userId",
     as: "user"
+
 });
 ReservationModel.belongsTo(ParkingLots, {
     foreignKey: "parkingLotId",

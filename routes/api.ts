@@ -16,6 +16,13 @@ import {
     updateParkingLot
 } from "../controllers/parkingLot.controller";
 import {getAllUsers, getUserById, updateUser} from "../controllers/user.controller";
+import {
+    createReservation,
+    deleteReservation,
+    getAllReservations,
+    getReservationById,
+    updateReservation
+} from "../controllers/reservation.controller";
 
 
 export default function routes(app: Application): void {
@@ -55,4 +62,12 @@ export default function routes(app: Application): void {
     app.get("/users", getAllUsers);
     app.get("/users/:id", getUserById);
     app.put("/users/:id", updateUser);
+
+    app.post("/reservations", createReservation);
+    app.get("/reservations", getAllReservations);
+    app.get("/reservations/:id", getReservationById);
+    app.put("/reservations/:id", updateReservation);
+    app.delete("/reservations/:id", deleteReservation);
+
+
 }
