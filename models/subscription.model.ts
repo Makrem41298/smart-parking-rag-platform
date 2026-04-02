@@ -1,9 +1,9 @@
 import {Sequelize, DataTypes, Model, Optional, ForeignKey} from "sequelize";
-import {User} from "./User";
-import {PlanParkingLot} from "./PlanParkingLot";
-import {SubscriptionStatus} from "./EnumType";
-import {PaymentTransaction} from "./PaymentTransaction";
-import {Reservation} from "./Reservation";
+import {UserModel} from "./user.model";
+import {PlanParkingLotModel} from "./planParkingLot.model";
+import {SubscriptionStatus} from "./enum.type";
+import {PaymentTransactionModel} from "./paymentTransaction.model";
+import {ReservationModel} from "./reservation.model";
 
 interface SubscriptionAttributes {
     id: number;
@@ -18,19 +18,19 @@ export interface CreateSubscriptionAttributes
     extends Optional<SubscriptionAttributes, "id"|"status"> {
 }
 
-export class Subscription
+export class SubscriptionModel
     extends Model<SubscriptionAttributes, CreateSubscriptionAttributes>
     implements SubscriptionAttributes {
     declare id: number;
     declare status: SubscriptionStatus;
-    declare planParkingLotId: ForeignKey<PlanParkingLot["id"]>;
-    declare userId: ForeignKey<User["id"]>;
+    declare planParkingLotId: ForeignKey<PlanParkingLotModel["id"]>;
+    declare userId: ForeignKey<UserModel["id"]>;
     declare startDate: Date;
     declare endDate: Date;
 }
 
 export const initSubscription = (sequelize: Sequelize): void => {
-    Subscription.init(
+    SubscriptionModel.init(
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -73,7 +73,7 @@ export const initSubscription = (sequelize: Sequelize): void => {
         },
         {
             sequelize,
-            modelName: "Subscription",
+            modelName: "SubscriptionModel",
             tableName: "subscriptions",
             timestamps: true,
 

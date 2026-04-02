@@ -1,9 +1,9 @@
 import {Sequelize, DataTypes, Model, Optional, ForeignKey} from "sequelize";
-import { PlanStatus } from "./EnumType";
-import {ParkingLots} from "./ParkingLot";
-import {Plan} from "./Plan";
-import {User} from "./User";
-import {Subscription} from "./Subscription";
+import { PlanStatus } from "./enum.type";
+import {ParkingLots} from "./parkingLot.model";
+import {PlanModel} from "./plan.model";
+import {UserModel} from "./user.model";
+import {SubscriptionModel} from "./subscription.model";
 
 export interface PlanParkingLotAttributes {
     id: number;
@@ -17,12 +17,12 @@ export interface PlanParkingLotAttributes {
 export interface CreatePlanParkingLotAttributes
     extends Optional<PlanParkingLotAttributes, "id" | "status"> {}
 
-export class PlanParkingLot
+export class PlanParkingLotModel
     extends Model<PlanParkingLotAttributes, CreatePlanParkingLotAttributes>
     implements PlanParkingLotAttributes
 {
     declare id: number;
-    declare planId: ForeignKey<Plan["id"]>;
+    declare planId: ForeignKey<PlanModel["id"]>;
     declare parkingLotId: ForeignKey<ParkingLots["id"]>;
     declare status: PlanStatus;
     declare renewFee: number;
@@ -30,7 +30,7 @@ export class PlanParkingLot
 }
 
 export const initPlanParkingLot = (sequelize: Sequelize): void => {
-    PlanParkingLot.init(
+    PlanParkingLotModel.init(
         {
             id: {
                 autoIncrement: true,
@@ -73,7 +73,7 @@ export const initPlanParkingLot = (sequelize: Sequelize): void => {
         },
         {
             sequelize,
-            modelName: "PlanParkingLot",
+            modelName: "PlanParkingLotModel",
             tableName: "plan_parking_lots",
             timestamps: true,
 

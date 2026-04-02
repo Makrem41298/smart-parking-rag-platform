@@ -1,6 +1,6 @@
 import { Sequelize, Model, DataTypes, Optional } from "sequelize";
-import {PlanParkingLot} from "./PlanParkingLot";
-import {ParkingLots} from "./ParkingLot";
+import {PlanParkingLotModel} from "./planParkingLot.model";
+import {ParkingLots} from "./parkingLot.model";
 
 export interface ActiveDay {
     day: string;
@@ -18,7 +18,7 @@ export interface PlanAttributes {
 export interface PlanCreationAttributes
     extends Optional<PlanAttributes, "id" | "activeDays"> {}
 
-export class Plan
+export class PlanModel
     extends Model<PlanAttributes, PlanCreationAttributes>
     implements PlanAttributes
 {
@@ -30,7 +30,7 @@ export class Plan
 }
 
 export const initPlan = (sequelize: Sequelize): void => {
-    Plan.init(
+    PlanModel.init(
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -57,7 +57,7 @@ export const initPlan = (sequelize: Sequelize): void => {
         },
         {
             sequelize,
-            modelName: "Plan",
+            modelName: "PlanModel",
             tableName: "plans",
             timestamps: true,
         }

@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes, Model, Optional } from "sequelize";
-import {PaymentTransaction} from "./PaymentTransaction";
+import {PaymentTransactionModel} from "./paymentTransaction.model";
 
 export interface InvoiceAttributes {
     id: number;
@@ -12,7 +12,7 @@ export interface InvoiceAttributes {
 export interface CreateInvoiceAttributes
     extends Optional<InvoiceAttributes, "id"> {}
 
-export class Invoice
+export class InvoiceModel
     extends Model<InvoiceAttributes, CreateInvoiceAttributes>
     implements InvoiceAttributes
 {
@@ -24,7 +24,7 @@ export class Invoice
 }
 
 export const initInvoice = (sequelize: Sequelize): void => {
-    Invoice.init(
+    InvoiceModel.init(
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -56,7 +56,7 @@ export const initInvoice = (sequelize: Sequelize): void => {
         },
         {
             sequelize,
-            modelName: "Invoice",
+            modelName: "InvoiceModel",
             tableName: "invoices",
             timestamps: true,
         }

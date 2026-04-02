@@ -1,8 +1,8 @@
 import {DataTypes, HasMany, Model, Optional, Sequelize} from "sequelize";
-import { Role, AccountStatus } from "./EnumType";
-import {Reservation} from "./Reservation";
-import {PlanParkingLot} from "./PlanParkingLot";
-import {Subscription} from "./Subscription";
+import { Role, AccountStatus } from "./enum.type";
+import {ReservationModel} from "./reservation.model";
+import {PlanParkingLotModel} from "./planParkingLot.model";
+import {SubscriptionModel} from "./subscription.model";
 
 export interface UserAttributes {
     id: number;
@@ -19,7 +19,7 @@ export interface UserAttributes {
 interface UserCreationAttributes
     extends Optional<UserAttributes, "id" | "role" | "accountStatus"> {}
 
-export class User extends Model<UserAttributes, UserCreationAttributes>
+export class UserModel extends Model<UserAttributes, UserCreationAttributes>
     implements UserAttributes {
     declare id: number;
     declare firstName: string;
@@ -35,7 +35,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes>
 }
 
 export const initUserModel = (sequelize: Sequelize) => {
-    User.init(
+    UserModel.init(
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -81,7 +81,7 @@ export const initUserModel = (sequelize: Sequelize) => {
         },
         {
             sequelize,
-            modelName: "User",
+            modelName: "UserModel",
             tableName: "users",
             timestamps: true,
         }
