@@ -23,6 +23,7 @@ import {
     getReservationById,
     updateReservation
 } from "../controllers/reservation.controller";
+import { createPlan, deletePlan, getAllPlans, getPlanById, updatePlan } from "../controllers/plan.controller";
 
 
 export default function routes(app: Application): void {
@@ -62,12 +63,17 @@ export default function routes(app: Application): void {
     app.get("/users", getAllUsers);
     app.get("/users/:id", getUserById);
     app.put("/users/:id", updateUser);
-
+//reservation
     app.post("/reservations", createReservation);
     app.get("/reservations", getAllReservations);
     app.get("/reservations/:id", getReservationById);
     app.put("/reservations/:id", updateReservation);
     app.delete("/reservations/:id", deleteReservation);
 
+    app.post("/plans", createPlan);
+    app.get("/plans", getAllPlans);
+    app.get("/plans/:id", getPlanById);
+    app.put("/plans/:id", updatePlan);
+    app.delete("/plans/:id", deletePlan);
 
 }
