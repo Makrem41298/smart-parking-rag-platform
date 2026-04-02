@@ -1,8 +1,8 @@
 import { Model, Optional, DataTypes, Sequelize, ForeignKey } from "sequelize";
-import { ReservationStatus } from "./EnumType";
-import { ParkingLots } from "./ParkingLot";
-import { User } from "./User";
-import {PaymentTransaction} from "./PaymentTransaction";
+import { ReservationStatus } from "./enum.type";
+import { ParkingLots } from "./parkingLot.model";
+import { UserModel } from "./user.model";
+import {PaymentTransactionModel} from "./paymentTransaction.model";
 
 export interface ReservationAttributes {
     id: number;
@@ -19,13 +19,13 @@ export interface ReservationAttributes {
 export interface CreateReservationAttributes
     extends Optional<ReservationAttributes, "id" | "status"> {}
 
-export class Reservation
+export class ReservationModel
     extends Model<ReservationAttributes, CreateReservationAttributes>
     implements ReservationAttributes
 {
     declare id: number;
     declare parkingLotId: ForeignKey<ParkingLots["id"]>;
-    declare userId: ForeignKey<User["id"]>;
+    declare userId: ForeignKey<UserModel["id"]>;
     declare startTimeDate: Date;
     declare endTimeDate: Date;
     declare totalPrice: number;
@@ -35,7 +35,7 @@ export class Reservation
 }
 
 export const initReservation = (sequelize: Sequelize): void => {
-    Reservation.init(
+    ReservationModel.init(
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -91,7 +91,7 @@ export const initReservation = (sequelize: Sequelize): void => {
         },
         {
             sequelize,
-            modelName: "Reservation",
+            modelName: "ReservationModel",
             tableName: "reservations",
             timestamps: true,
         }

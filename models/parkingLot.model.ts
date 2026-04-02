@@ -1,10 +1,10 @@
 import { DataTypes, ForeignKey, Model, Optional, Sequelize } from "sequelize";
-import { ParkingStatus } from "./EnumType";
-import { TarifGrid } from "./TarifGrid";
-import {Reservation} from "./Reservation";
-import {User} from "./User";
-import {Plan} from "./Plan";
-import {PlanParkingLot} from "./PlanParkingLot";
+import { ParkingStatus } from "./enum.type";
+import { TarifGridModel } from "./tarifGrid.model";
+import {ReservationModel} from "./reservation.model";
+import {UserModel} from "./user.model";
+import {PlanModel} from "./plan.model";
+import {PlanParkingLotModel} from "./planParkingLot.model";
 
 export interface ParkingLotAttributes {
     id: number;
@@ -50,7 +50,7 @@ export class ParkingLots
     declare statusParking: ParkingStatus;
     declare reservationAvailability: boolean;
     declare subscriptionAvailability: boolean;
-    declare tarifGridId: ForeignKey<TarifGrid["id"]> | null;
+    declare tarifGridId: ForeignKey<TarifGridModel["id"]> | null;
 }
 
 export const initParkingLotModel = (sequelize: Sequelize): void => {

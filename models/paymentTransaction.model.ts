@@ -1,8 +1,8 @@
 import { Model, Optional, DataTypes, Sequelize } from "sequelize";
-import { PaymentStatus } from "./EnumType";
-import {Invoice} from "./Invoice";
-import {Reservation} from "./Reservation";
-import {Subscription} from "./Subscription";
+import { PaymentStatus } from "./enum.type";
+import {InvoiceModel} from "./invoice.model";
+import {ReservationModel} from "./reservation.model";
+import {SubscriptionModel} from "./subscription.model";
 
 export interface PaymentTransactionAttributes {
     id: number;
@@ -17,7 +17,7 @@ export interface PaymentTransactionAttributes {
 export interface CreatePaymentTransactionAttributes
     extends Optional<PaymentTransactionAttributes, "id" | "status"> {}
 
-const uppercaseFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);export class PaymentTransaction
+const uppercaseFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);export class PaymentTransactionModel
     extends Model<PaymentTransactionAttributes, CreatePaymentTransactionAttributes>
     implements PaymentTransactionAttributes
 {
@@ -40,7 +40,7 @@ const uppercaseFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(
     }
 }
 export const initPaymentTransaction = (sequelize: Sequelize): void => {
-    PaymentTransaction.init(
+    PaymentTransactionModel.init(
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -76,7 +76,7 @@ export const initPaymentTransaction = (sequelize: Sequelize): void => {
         },
         {
             sequelize,
-            modelName: "PaymentTransaction",
+            modelName: "PaymentTransactionModel",
             tableName: "payment_transactions",
             timestamps: true,
         }

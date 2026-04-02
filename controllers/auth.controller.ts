@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
-import {AccountStatus} from "../models/EnumType";
-import {User} from "../models/User";
+import {AccountStatus} from "../models/enum.type";
+import {UserModel} from "../models/user.model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import {AuthRequest} from "../middlewares/auth.middleware";
@@ -14,7 +14,7 @@ export const register = async (req: Request, res: Response) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = await User.create({
+        const user = await UserModel.create({
             firstName,
             lastName,
             email,
@@ -42,7 +42,7 @@ export const login = async (req: Request, res: Response) => {
             });
         }
 
-        const user = await User.findOne({
+        const user = await UserModel.findOne({
             where: { email },
             attributes: ["id", "firstName", "lastName", "email", "password"],
         });
@@ -129,12 +129,12 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
         // @ts-ignore
         const userId = req.user.id;
 
-        const user = await User.findByPk(userId, {
+        const user = await UserModel.findByPk(userId, {
             attributes: ["id", "firstName", "lastName", "email", "phone","CIN","accountStatus","role",],
         });
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "UserModel not found" });
         }
 
         return res.json(user);

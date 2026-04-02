@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes, Optional, Model } from "sequelize";
-import {ParkingLots} from "./ParkingLot";
+import {ParkingLots} from "./parkingLot.model";
 
 export interface TarifGridItem {
     minutes: number;
@@ -15,7 +15,7 @@ export interface TarifGridAttributes {
 interface TarifGridCreationAttributes
     extends Optional<TarifGridAttributes, "id"> {}
 
-export class TarifGrid
+export class TarifGridModel
     extends Model<TarifGridAttributes, TarifGridCreationAttributes>
     implements TarifGridAttributes
 {
@@ -25,7 +25,7 @@ export class TarifGrid
 }
 
 export const initTarifGrid = (sequelize: Sequelize): void => {
-    TarifGrid.init(
+    TarifGridModel.init(
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -44,7 +44,7 @@ export const initTarifGrid = (sequelize: Sequelize): void => {
         {
             sequelize,
             tableName: "tariff_grids",
-            modelName: "TarifGrid",
+            modelName: "TarifGridModel",
             timestamps: true,
         }
     );
