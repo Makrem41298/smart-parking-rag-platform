@@ -8,6 +8,13 @@ import {
     getTarifGridById,
     updateTarifGrid
 } from "../controllers/tarifGrid.controller";
+import {
+    createParkingLot,
+    deleteParkingLot,
+    getAllParkingLots,
+    getParkingLotById,
+    updateParkingLot
+} from "../controllers/parkingLot.controller";
 
 
 export default function routes(app: Application): void {
@@ -33,4 +40,15 @@ export default function routes(app: Application): void {
     app.get("/tarif-grid/:id", getTarifGridById);
     app.put("/tarif-grid/:id", updateTarifGrid);
     app.delete("/tarif-grid/:id", deleteTarifGrid);
+
+
+//parking Lots
+    app.post("/parking-lot", createParkingLot);
+    app.get("/parking-lot", getAllParkingLots);
+    app.get("/parking-lot/:id", getParkingLotById);
+    app.put("/parking-lot/:id", updateParkingLot);
+    app.delete("/parking-lot/:id", deleteParkingLot);
+
+
+
 }

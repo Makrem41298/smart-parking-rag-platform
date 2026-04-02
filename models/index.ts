@@ -33,7 +33,10 @@ initTarifGrid(sequelize); // ✅ ADD THIS
 
 
 
-TarifGridModel.hasMany(ParkingLots)
+TarifGridModel.hasMany(ParkingLots, {
+    foreignKey: "tarifGridId",
+    as: "parkingLots"
+});
 InvoiceModel.belongsTo(PaymentTransactionModel, {
     foreignKey: "paymentTransactionId",
     as: "paymentTransaction",
@@ -50,8 +53,11 @@ ParkingLots.belongsToMany(PlanModel, {
 });
 ParkingLots.belongsTo(TarifGridModel, {
     foreignKey: "tarifGridId",
-    as: "tarifGrid",
+    as: "tarifGrid"
 });
+
+
+
 PaymentTransactionModel.hasOne(InvoiceModel, {
     foreignKey: "paymentTransactionId",
     as: "invoice",
