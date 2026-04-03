@@ -44,7 +44,7 @@ export const login = async (req: Request, res: Response) => {
 
         const user = await UserModel.findOne({
             where: { email },
-            attributes: ["id", "firstName", "lastName", "email", "password"],
+            attributes: ["id", "firstName", "lastName", "email", "password","role"],
         });
 
         if (!user || !user.password) {
@@ -64,12 +64,14 @@ export const login = async (req: Request, res: Response) => {
             {
                 id: user.id?.toString(),
                 email: user.email,
+                role: user.role,
             },
             process.env.JWT_SECRET,
             {
                 expiresIn: "1d",
             }
         );
+
 
         // ✅ REMOVE PASSWORD
         const { password: _, ...userData } = user.toJSON();

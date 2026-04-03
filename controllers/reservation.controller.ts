@@ -168,21 +168,3 @@ export const updateReservation = async (req: Request, res: Response) => {
 };
 
 
-export const deleteReservation = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-
-        // @ts-ignore
-        const reservation = await ReservationModel.findByPk(id);
-        if (!reservation) {
-            return res.status(404).json({ message: "Reservation not found" });
-        }
-
-        await reservation.destroy();
-
-        return res.status(200).json({ message: "Reservation deleted successfully" });
-    } catch (error) {
-        console.error("Error deleting reservation:", error);
-        return res.status(500).json({ message: "Internal server error" });
-    }
-};
