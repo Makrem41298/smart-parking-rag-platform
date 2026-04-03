@@ -9,7 +9,7 @@ export enum Role{
 }
 export enum ParkingStatus {
     OPEN= "OPEN",
-    CLOSE= "CLOSE",
+    CLOSED= "CLOSED",
     MAINTENANCE= "MAINTENANCE",
 }
 export enum PlanStatus {

@@ -17,7 +17,7 @@ export interface ReservationAttributes {
 }
 
 export interface CreateReservationAttributes
-    extends Optional<ReservationAttributes, "id" | "status"> {}
+    extends Optional<ReservationAttributes, "id" | "status"|"leaveTime"|"entryTime"> {}
 
 export class ReservationModel
     extends Model<ReservationAttributes, CreateReservationAttributes>
@@ -82,10 +82,12 @@ export const initReservation = (sequelize: Sequelize): void => {
             entryTime: {
                 type: DataTypes.DATE,
                 allowNull: true,
+                defaultValue:null
             },
             leaveTime: {
                 type: DataTypes.DATE,
                 allowNull: true,
+                defaultValue:null
             }
 
         },
