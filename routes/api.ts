@@ -2,35 +2,15 @@ import { Application } from "express";
 import {getProfile, login, logout, refreshToken, register} from "../controllers/auth.controller";
 import test from "node:test";
 import {authMiddleware} from "../middlewares/auth.middleware";
-import {
-    createTarifGrid, deleteTarifGrid,
-    getAllTarifGrids,
-    getTarifGridById,
-    updateTarifGrid
-} from "../controllers/tarifGrid.controller";
-import {
-    createParkingLot,
-    deleteParkingLot,
-    getAllParkingLots,
-    getParkingLotById,
-    updateParkingLot
-} from "../controllers/parkingLot.controller";
+import {createTarifGrid, deleteTarifGrid, getAllTarifGrids, getTarifGridById, updateTarifGrid} from "../controllers/tarifGrid.controller";
+import {createParkingLot, deleteParkingLot, getAllParkingLots, getParkingLotById, updateParkingLot} from "../controllers/parkingLot.controller";
 import {getAllUsers, getUserById, updateUser} from "../controllers/user.controller";
-import {
-    createReservation,
-    deleteReservation,
-    getAllReservations,
-    getReservationById,
-    updateReservation
-} from "../controllers/reservation.controller";
+import {createReservation, getAllReservations, getReservationById, updateReservation} from "../controllers/reservation.controller";
 import { createPlan, deletePlan, getAllPlans, getPlanById, updatePlan } from "../controllers/plan.controller";
-import {
-    createPlanParkingLot
-    , deletePlanParkingLot,
-    getAllPlanParkingLots,
-    getPlanParkingLotById, updatePlanParkingLot
-} from "../controllers/planParkingLot.controller";
+import {createPlanParkingLot, deletePlanParkingLot, getAllPlanParkingLots, getPlanParkingLotById, updatePlanParkingLot} from "../controllers/planParkingLot.controller";
 import {createSubscription, getAllSubscriptions, getSubscriptionById} from "../controllers/subscription.controller";
+import {requireRole} from "../middlewares/role.middleware";
+import {Role} from "../models/enum.type";
 
 
 export default function routes(app: Application): void {
@@ -44,54 +24,51 @@ export default function routes(app: Application): void {
     //auth users
     app.post("/register", register);
     app.post("/login", login);
-    app.post("/refresh", refreshToken);
-// 🔐 Protected routes
+    app.post("/refresh",authMiddleware, refreshToken);
     app.post("/logout", authMiddleware, logout);
     app.get("/profile", authMiddleware, getProfile);
 
 
 //tariff grids
-    app.post("/tarif-grid", createTarifGrid);
+    app.post("/tarif-grid", authMiddleware,requireRole([Role.ADMIN]), createTarifGrid);
     app.get("/tarif-grid", getAllTarifGrids);
     app.get("/tarif-grid/:id", getTarifGridById);
-    app.put("/tarif-grid/:id", updateTarifGrid);
-    app.delete("/tarif-grid/:id", deleteTarifGrid);
+    app.put("/tarif-grid/:id", authMiddleware,requireRole([Role.ADMIN]), updateTarifGrid);
+    app.delete("/tarif-grid/:id", authMiddleware,requireRole([Role.ADMIN]), deleteTarifGrid);
 
 
 //parking Lots
-    app.post("/parking-lot", createParkingLot);
+    app.post("/parking-lot", authMiddleware,requireRole([Role.ADMIN]), createParkingLot);
     app.get("/parking-lot", getAllParkingLots);
     app.get("/parking-lot/:id", getParkingLotById);
-    app.put("/parking-lot/:id", updateParkingLot);
-    app.delete("/parking-lot/:id", deleteParkingLot);
+    app.put("/parking-lot/:id", authMiddleware,requireRole([Role.ADMIN]), updateParkingLot);
+    app.delete("/parking-lot/:id", authMiddleware,requireRole([Role.ADMIN]), deleteParkingLot);
 
 
 //users
-    app.get("/users", getAllUsers);
-    app.get("/users/:id", getUserById);
-    app.put("/users/:id", updateUser);
+    app.get("/users", authMiddleware,requireRole([Role.ADMIN]), getAllUsers);
+    app.get("/users/:id", authMiddleware,requireRole([Role.ADMIN]), getUserById);
+    app.put("/users/:id", authMiddleware,requireRole([Role.ADMIN]), updateUser);
 //reservations
-    app.post("/reservations", createReservation);
-    app.get("/reservations", getAllReservations);
-    app.get("/reservations/:id", getReservationById);
-    app.put("/reservations/:id", updateReservation);
-    app.delete("/reservations/:id", deleteReservation);
+    app.post("/reservations", authMiddleware,requireRole([Role.CLIENT]), createReservation);
+    app.get("/reservations",authMiddleware, getAllReservations);
+    app.get("/reservations/:id",authMiddleware, getReservationById);
+    app.put("/reservations/:id",authMiddleware, updateReservation);
 // plans
-    app.post("/plans", createPlan);
-    app.get("/plans", getAllPlans);
-    app.get("/plans/:id", getPlanById);
-    app.put("/plans/:id", updatePlan);
-    app.delete("/plans/:id", deletePlan);
-//plan parking
-    app.post("/plan-parking-lot", createPlanParkingLot);
+    app.post("/plans", authMiddleware,requireRole([Role.ADMIN]), createPlan);
+    app.get("/plans", authMiddleware,requireRole([Role.ADMIN]), getAllPlans);
+    app.get("/plans/:id", authMiddleware,requireRole([Role.ADMIN]), getPlanById);
+    app.put("/plans/:id", authMiddleware,requireRole([Role.ADMIN]), updatePlan);
+    app.delete("/plans/:id", authMiddleware,requireRole([Role.ADMIN]), deletePlan);
+//parking 's plan
+    app.post("/plan-parking-lot", authMiddleware,requireRole([Role.ADMIN]), createPlanParkingLot);
     app.get("/plan-parking-lot", getAllPlanParkingLots);
     app.get("/plan-parking-lot/:id", getPlanParkingLotById);
-    app.put("/plan-parking-lot/:id", updatePlanParkingLot);
-    app.delete("/plan-parking-lot/:id", deletePlanParkingLot);
+    app.put("/plan-parking-lot/:id", authMiddleware,requireRole([Role.ADMIN]), updatePlanParkingLot);
+    app.delete("/plan-parking-lot/:id", authMiddleware,requireRole([Role.ADMIN]), deletePlanParkingLot);
 
-
-
-    app.post("/subscriptions", createSubscription);
-    app.get("/subscriptions", getAllSubscriptions);
-    app.get("/subscriptions/:id", getSubscriptionById);
+//subscription
+    app.post("/subscriptions",authMiddleware,requireRole([Role.CLIENT]), createSubscription);
+    app.get("/subscriptions",authMiddleware,requireRole([Role.ADMIN]), getAllSubscriptions);
+    app.get("/subscriptions/:id",authMiddleware, getSubscriptionById);
 }

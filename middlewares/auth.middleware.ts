@@ -1,11 +1,22 @@
 import {NextFunction, Request, Response} from "express";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import Interceptors from "undici-types/interceptors";
-import dump = Interceptors.dump;
+import {Role} from "../models/enum.type";
+
+export interface JwtUser {
+    id: number;
+    email: string;
+    role: Role;
+}
+
 
 export interface AuthRequest extends Request {
-    user?: JwtPayload | string;
+    user?: JwtUser ;
 }
+
+
+
+
 
 export const authMiddleware = (
     req: AuthRequest,
@@ -20,13 +31,15 @@ export const authMiddleware = (
         }
 
 
+
         const token = header.split(" ")[1];
 
         if (!process.env.JWT_SECRET) {
             throw new Error("JWT_SECRET is not defined");
         }
 
-        req.user = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = jwt.verify(token, process.env.JWT_SECRET) as JwtUser;
+        console.log(req.user);
         next();
     } catch (err) {
         return res.status(401).json({ message: "Invalid token" });
