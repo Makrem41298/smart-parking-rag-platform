@@ -1,35 +1,53 @@
-import { Request, Response } from "express";
-import { ReservationModel } from "../models/reservation.model";
-import { ParkingLots } from "../models/parkingLot.model";
-import { UserModel } from "../models/user.model";
-import { ReservationStatus } from "../models/enum.type";
+import {Request, Response} from "express";
+import {ReservationModel} from "../models/reservation.model";
+import {ParkingLots} from "../models/parkingLot.model";
+import {UserModel} from "../models/user.model";
+import {ReservationStatus, Role} from "../models/enum.type";
+import {AuthRequest} from "../middlewares/auth.middleware";
+import {TarifGridModel} from "../models/tarifGrid.model";
 
 // Create reservation
-export const createReservation = async (req: Request, res: Response) => {
+export const createReservation = async (req: AuthRequest, res: Response) => {
     try {
         const {
             parkingLotId,
-            userId,
             startTimeDate,
             endTimeDate,
-            totalPrice,
             status,
             entryTime,
             leaveTime
         } = req.body;
 
+       const userId:number|undefined=req.user?.id
+
+
+
+
         // Required fields
-        if (!parkingLotId || !userId || !startTimeDate || !endTimeDate || !totalPrice) {
+        if (!parkingLotId || !userId || !startTimeDate || !endTimeDate ) {
             return res.status(400).json({
                 message: "Missing required fields: parkingLotId, userId, startTimeDate, endTimeDate, totalPrice"
             });
         }
 
         // Validate FK: parking lot
-        const parking = await ParkingLots.findByPk(parkingLotId);
+        const parking = await ParkingLots.findByPk(parkingLotId,
+            {
+                include: [{ model: TarifGridModel, as: "tarifGrid" }]
+            });
         if (!parking) {
             return res.status(400).json({ message: "Invalid parkingLotId" });
         }
+        const startDate = new Date(startTimeDate);
+        const endDate = new Date(endTimeDate);
+        const diffInMinutes = Math.floor(
+            (endDate.getTime() - startDate.getTime()) / (1000 * 60)
+        );
+        const totalPrice = calculatePrice(
+            diffInMinutes,
+            parking.tarifGrid.dataValues.grid
+        );
+        console.log("PRICE", totalPrice);
 
         // Validate FK: user
         const user = await UserModel.findByPk(userId);
@@ -63,16 +81,28 @@ export const createReservation = async (req: Request, res: Response) => {
 };
 
 // Get all reservations
-export const getAllReservations = async (_req: Request, res: Response) => {
+export const getAllReservations = async (_req: AuthRequest, res: Response) => {
     try {
+        if (!_req.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const whereCondition = _req.user.role === Role.ADMIN ? {} : { userId: _req.user.id };
+
         const reservations = await ReservationModel.findAll({
+            where: whereCondition,
             include: [
                 { model: ParkingLots, as: "parkingLot" },
-                { model: UserModel, as: "user",attributes:{exclude:["password"] } }
+                {
+                    model: UserModel,
+                    as: "user",
+                    attributes: { exclude: ["password"] }
+                }
             ]
         });
 
         return res.status(200).json(reservations);
+
     } catch (error) {
         console.error("Error fetching reservations:", error);
         return res.status(500).json({ message: "Internal server error" });
@@ -80,12 +110,15 @@ export const getAllReservations = async (_req: Request, res: Response) => {
 };
 
 // Get reservation by ID
-export const getReservationById = async (req: Request, res: Response) => {
+export const getReservationById = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
-
-        // @ts-ignore
-        const reservation = await ReservationModel.findByPk(id, {
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const whereCondition = req.user.role === Role.ADMIN ? {id:id} : { userId: req.user.id ,id:id};
+        const reservation = await ReservationModel.findOne({
+            where: whereCondition,
             include: [
                 { model: ParkingLots, as: "parkingLot" },
                 { model: UserModel, as: "user",attributes:{exclude:["password"] } }
@@ -104,12 +137,22 @@ export const getReservationById = async (req: Request, res: Response) => {
 };
 
 // Update reservation
-export const updateReservation = async (req: Request, res: Response) => {
+export const updateReservation = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
+        if (!req.user) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
 
-        // @ts-ignore
-        const reservation = await ReservationModel.findByPk(id);
+        const whereCondition = req.user.role === Role.ADMIN ? {id:id} : { userId: req.user.id ,id:id};
+        const reservation = await ReservationModel.findOne({
+            where: whereCondition,
+            include: [
+                { model: ParkingLots, as: "parkingLot" },
+                { model: UserModel, as: "user",attributes:{exclude:["password"] } }
+            ]
+        });
+
         if (!reservation) {
             return res.status(404).json({ message: "Reservation not found" });
         }
@@ -166,5 +209,22 @@ export const updateReservation = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
+const calculatePrice = (diffInMinutes: number, tarifGrid: { price: number; minutes: number }[]): number =>
+
+{
+
+    const sortedGrid = tarifGrid.sort(
+        (a, b) => a.minutes - b.minutes
+    );
+
+    const tarif = sortedGrid.find(
+        t => diffInMinutes <= t.minutes
+    );
+
+    return tarif
+        ? tarif.price
+        : sortedGrid[sortedGrid.length - 1].price;
+};
+
 
 

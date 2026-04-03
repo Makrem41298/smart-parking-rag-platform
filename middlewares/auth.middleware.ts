@@ -12,7 +12,7 @@ export interface JwtUser {
 
 export interface AuthRequest extends Request {
     user?: JwtUser ;
-}
+ }
 
 
 
@@ -25,6 +25,7 @@ export const authMiddleware = (
 ) => {
     try {
         const header = req.headers.authorization;
+
 
         if (!header) {
             return res.status(401).json({ message: "No token" });
