@@ -45,12 +45,9 @@ ParkingLots.hasMany(ReservationModel, {
     foreignKey: "parkingLotId",
     as: "reservations",
 });
-ParkingLots.belongsToMany(PlanModel, {
-    through: PlanParkingLotModel,
-    foreignKey: "parkingLotId",
-    otherKey: "planId",
-    as: "plans",
-});
+
+
+
 ParkingLots.belongsTo(TarifGridModel, {
     foreignKey: "tarifGridId",
     as: "tarifGrid"
@@ -63,13 +60,26 @@ PaymentTransactionModel.hasOne(InvoiceModel, {
     as: "invoice",
 });PaymentTransactionModel.belongsTo(ReservationModel, { foreignKey: 'paymentableId', constraints: false });
 PaymentTransactionModel.belongsTo(SubscriptionModel, { foreignKey: 'paymentableId', constraints: false });
-PlanModel.belongsToMany(ParkingLots,{through:PlanParkingLotModel})
-PlanParkingLotModel.belongsToMany(UserModel,{through:SubscriptionModel})
+
 ReservationModel.belongsTo(UserModel, {
     foreignKey: "userId",
     as: "user"
 
 });
+PlanParkingLotModel.belongsToMany(UserModel, {
+    through: SubscriptionModel,
+    foreignKey: "planParkingLotId",
+    otherKey: "userId",
+    as: "users"
+});
+
+UserModel.belongsToMany(PlanParkingLotModel, {
+    through: SubscriptionModel,
+    foreignKey: "userId",
+    otherKey: "planParkingLotId",
+    as: "planParkingLots"
+});
+
 ReservationModel.belongsTo(ParkingLots, {
     foreignKey: "parkingLotId",
     as: "parkingLot"
@@ -94,7 +104,51 @@ UserModel.hasMany(ReservationModel, {
     foreignKey: "userId",
     as: "reservations",
 });
-UserModel.belongsToMany(PlanParkingLotModel,{through:SubscriptionModel})
+
+PlanParkingLotModel.belongsTo(PlanModel, {
+    foreignKey: "planId",
+    as: "plan"
+});
+
+PlanModel.hasMany(PlanParkingLotModel, {
+    foreignKey: "planId",
+    as: "planParkingLots"
+});
+
+PlanParkingLotModel.belongsTo(ParkingLots, {
+    foreignKey: "parkingLotId",
+    as: "parkingLot"
+});
+
+ParkingLots.hasMany(PlanParkingLotModel, {
+    foreignKey: "parkingLotId",
+    as: "planParkingLots"
+});
+
+
+SubscriptionModel.belongsTo(UserModel, {
+    foreignKey: "userId",
+    as: "users"
+});
+
+UserModel.hasMany(SubscriptionModel, {
+    foreignKey: "userId",
+    as: "subscriptions"
+});
+
+
+
+PlanParkingLotModel.hasMany(SubscriptionModel, {
+    foreignKey: 'planParkingLotId',
+    as: 'subscriptions'
+});
+
+SubscriptionModel.belongsTo(PlanParkingLotModel, {
+    foreignKey: 'planParkingLotId',
+    as: 'PlanParkingLots'
+});
+
+
 
 
 export default sequelize;
