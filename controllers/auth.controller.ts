@@ -44,7 +44,7 @@ export const login = async (req: Request, res: Response) => {
 
         const user = await UserModel.findOne({
             where: { email },
-            attributes: ["id", "firstName", "lastName", "email", "password","role"],
+            attributes: ["id", "firstName", "lastName", "email", "password","role","accountStatus"],
         });
 
         if (!user || !user.password) {
@@ -59,12 +59,13 @@ export const login = async (req: Request, res: Response) => {
         if (!process.env.JWT_SECRET) {
             throw new Error("JWT_SECRET is not defined");
         }
-
+console.log(user.accountStatus)
         const token = jwt.sign(
             {
                 id: user.id?.toString(),
                 email: user.email,
                 role: user.role,
+                accountStatus:user.accountStatus
             },
             process.env.JWT_SECRET,
             {
