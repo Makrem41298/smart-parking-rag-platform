@@ -54,7 +54,7 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 // Update user
-export const updateUser = async (req: Request, res: Response) => {
+export const updateStatusUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
 
@@ -64,23 +64,14 @@ export const updateUser = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "User not found" });
         }
 
+        if (user.role === Role.ADMIN) {
+            return res.status(403).json({ message: "cannot update status of admin" });
+        }
+
         const {
-            firstName,
-            lastName,
-            email,
-            password,
-            phone,
-            CIN,
-            role,
             accountStatus
         } = req.body;
 
-        // Validate ENUMs
-        if (role && !Object.values(Role).includes(role)) {
-            return res.status(400).json({
-                message: `Invalid role. Allowed: ${Object.values(Role).join(", ")}`
-            });
-        }
 
         if (accountStatus && !Object.values(AccountStatus).includes(accountStatus)) {
             return res.status(400).json({
@@ -88,22 +79,7 @@ export const updateUser = async (req: Request, res: Response) => {
             });
         }
 
-        // Check email uniqueness
-        if (email && email !== user.email) {
-            const existing = await UserModel.findOne({ where: { email } });
-            if (existing) {
-                return res.status(409).json({ message: "Email already exists" });
-            }
-        }
-
         await user.update({
-            firstName,
-            lastName,
-            email,
-            password,
-            phone,
-            CIN,
-            role,
             accountStatus
         });
 
