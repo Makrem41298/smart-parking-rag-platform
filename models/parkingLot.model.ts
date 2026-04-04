@@ -5,6 +5,12 @@ import {ReservationModel} from "./reservation.model";
 import {UserModel} from "./user.model";
 import {PlanModel} from "./plan.model";
 import {PlanParkingLotModel} from "./planParkingLot.model";
+export interface grids {
+    grid:[];
+}
+export interface dataValues {
+    dataValues:grids;
+}
 
 export interface ParkingLotAttributes {
     id: number;
@@ -51,6 +57,7 @@ export class ParkingLots
     declare reservationAvailability: boolean;
     declare subscriptionAvailability: boolean;
     declare tarifGridId: ForeignKey<TarifGridModel["id"]> | null;
+    declare tarifGrid:dataValues;
 }
 
 export const initParkingLotModel = (sequelize: Sequelize): void => {

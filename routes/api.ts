@@ -1,10 +1,9 @@
 import { Application } from "express";
 import {getProfile, login, logout, refreshToken, register} from "../controllers/auth.controller";
-import test from "node:test";
 import {authMiddleware} from "../middlewares/auth.middleware";
 import {createTarifGrid, deleteTarifGrid, getAllTarifGrids, getTarifGridById, updateTarifGrid} from "../controllers/tarifGrid.controller";
 import {createParkingLot, deleteParkingLot, getAllParkingLots, getParkingLotById, updateParkingLot} from "../controllers/parkingLot.controller";
-import {getAllUsers, getUserById, updateUser} from "../controllers/user.controller";
+import {getAllUsers, getUserById, updateStatusUser} from "../controllers/user.controller";
 import {createReservation, getAllReservations, getReservationById, updateReservation} from "../controllers/reservation.controller";
 import { createPlan, deletePlan, getAllPlans, getPlanById, updatePlan } from "../controllers/plan.controller";
 import {createPlanParkingLot, deletePlanParkingLot, getAllPlanParkingLots, getPlanParkingLotById, updatePlanParkingLot} from "../controllers/planParkingLot.controller";
@@ -48,7 +47,7 @@ export default function routes(app: Application): void {
 //users
     app.get("/users", authMiddleware,requireRole([Role.ADMIN]), getAllUsers);
     app.get("/users/:id", authMiddleware,requireRole([Role.ADMIN]), getUserById);
-    app.put("/users/:id", authMiddleware,requireRole([Role.ADMIN]), updateUser);
+    app.put("/users/:id", authMiddleware,requireRole([Role.ADMIN]), updateStatusUser);
 //reservations
     app.post("/reservations", authMiddleware,requireRole([Role.CLIENT]), createReservation);
     app.get("/reservations",authMiddleware, getAllReservations);
@@ -69,6 +68,6 @@ export default function routes(app: Application): void {
 
 //subscription
     app.post("/subscriptions",authMiddleware,requireRole([Role.CLIENT]), createSubscription);
-    app.get("/subscriptions",authMiddleware,requireRole([Role.ADMIN]), getAllSubscriptions);
+    app.get("/subscriptions",authMiddleware, getAllSubscriptions);
     app.get("/subscriptions/:id",authMiddleware, getSubscriptionById);
 }

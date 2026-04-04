@@ -13,6 +13,7 @@ export interface PlanAttributes {
     activeDays: ActiveDay[] | null;
     startDate: Date;
     endDate: Date;
+    NumberOfBenefitDays: number;
 }
 
 export interface PlanCreationAttributes
@@ -27,6 +28,7 @@ export class PlanModel
     declare activeDays: ActiveDay[] | null;
     declare startDate: Date;
     declare endDate: Date;
+    declare NumberOfBenefitDays: number;
 }
 
 export const initPlan = (sequelize: Sequelize): void => {
@@ -54,6 +56,11 @@ export const initPlan = (sequelize: Sequelize): void => {
                 type: DataTypes.DATE,
                 allowNull: false,
             },
+            NumberOfBenefitDays: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            }
+
         },
         {
             sequelize,
