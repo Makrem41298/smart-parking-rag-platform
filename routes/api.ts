@@ -69,6 +69,6 @@ export default function routes(app: Application): void {
 
 //subscription
     app.post("/subscriptions",authMiddleware,requireRole([Role.CLIENT]), createSubscription);
-    app.get("/subscriptions",authMiddleware,requireRole([Role.ADMIN]), getAllSubscriptions);
+    app.get("/subscriptions",authMiddleware, getAllSubscriptions);
     app.get("/subscriptions/:id",authMiddleware, getSubscriptionById);
 }

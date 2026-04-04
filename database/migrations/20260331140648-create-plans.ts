@@ -30,6 +30,10 @@ module.exports = {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      NumberOfBenefitDays:{
+        allowNull: false,
+        type: DataTypes.INTEGER,
+      },
 
       createdAt: {
         allowNull: false,

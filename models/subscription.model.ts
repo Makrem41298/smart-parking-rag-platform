@@ -18,8 +18,7 @@ export interface CreateSubscriptionAttributes
     extends Optional<SubscriptionAttributes, "id"|"status"> {
 }
 
-export class SubscriptionModel
-    extends Model<SubscriptionAttributes, CreateSubscriptionAttributes>
+export class SubscriptionModel extends Model<SubscriptionAttributes, CreateSubscriptionAttributes>
     implements SubscriptionAttributes {
     declare id: number;
     declare status: SubscriptionStatus;

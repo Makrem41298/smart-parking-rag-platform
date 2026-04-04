@@ -4,7 +4,7 @@ import { PlanModel } from "../models/plan.model";
 // Create a plan
 export const createPlan = async (req: Request, res: Response) => {
     try {
-        const { name, activeDays, startDate, endDate } = req.body;
+        const { name, activeDays, startDate, endDate,NumberOfBenefitDays } = req.body;
 
         if (!name || !startDate || !endDate) {
             return res.status(400).json({
@@ -16,7 +16,8 @@ export const createPlan = async (req: Request, res: Response) => {
             name,
             activeDays,
             startDate,
-            endDate
+            endDate,
+            NumberOfBenefitDays
         });
 
         return res.status(201).json(plan);
@@ -67,13 +68,14 @@ export const updatePlan = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Plan not found" });
         }
 
-        const { name, activeDays, startDate, endDate } = req.body;
+        const { name, activeDays, startDate, endDate,NumberOfBenefitDays } = req.body;
 
         await plan.update({
             name,
             activeDays,
             startDate,
-            endDate
+            endDate,
+            NumberOfBenefitDays
         });
 
         return res.status(200).json(plan);
