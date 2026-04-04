@@ -26,7 +26,7 @@ export default function routes(app: Application): void {
     app.post("/refresh",authMiddleware, refreshToken);
     app.post("/logout", authMiddleware, logout);
     app.get("/profile", authMiddleware, getProfile);
-    app.get("/change-password", authMiddleware, changePassword);
+    app.put("/change-password", authMiddleware, changePassword);
 
 
 //tariff grids
