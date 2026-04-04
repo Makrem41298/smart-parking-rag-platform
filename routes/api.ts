@@ -1,5 +1,5 @@
 import { Application } from "express";
-import {getProfile, login, logout, refreshToken, register} from "../controllers/auth.controller";
+import {changePassword, getProfile, login, logout, refreshToken, register} from "../controllers/auth.controller";
 import {authMiddleware} from "../middlewares/auth.middleware";
 import {createTarifGrid, deleteTarifGrid, getAllTarifGrids, getTarifGridById, updateTarifGrid} from "../controllers/tarifGrid.controller";
 import {createParkingLot, deleteParkingLot, getAllParkingLots, getParkingLotById, updateParkingLot} from "../controllers/parkingLot.controller";
@@ -26,6 +26,7 @@ export default function routes(app: Application): void {
     app.post("/refresh",authMiddleware, refreshToken);
     app.post("/logout", authMiddleware, logout);
     app.get("/profile", authMiddleware, getProfile);
+    app.get("/change-password", authMiddleware, changePassword);
 
 
 //tariff grids
