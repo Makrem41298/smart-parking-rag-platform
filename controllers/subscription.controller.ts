@@ -35,7 +35,7 @@ export const createSubscription = async (req: AuthRequest, res: Response) => {
         const startDate = new Date();
 
         if (startDate < plan.startDate || startDate > plan.endDate) {
-            return res.status(400).json({ message: "Invalid startDate" });
+            return res.status(400).json({ message: "Invalid plan date expires or don't  starts" });
         }
 
         const endDate = new Date(startDate);

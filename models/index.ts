@@ -10,6 +10,8 @@ import {initPlan, PlanModel} from "./plan.model";
 import {initParkingLotModel, ParkingLots} from "./parkingLot.model";
 import {initReservation, ReservationModel} from "./reservation.model";
 import {initTarifGrid, TarifGridModel} from "./tarifGrid.model";
+import {initReclamation, Reclamation} from "./reclamation.model";
+import {Role} from "./enum.type";
 
 const env = process.env.NODE_ENV || "development";
 const dbConfig = (config as any)[env];
@@ -30,7 +32,29 @@ initSubscription(sequelize);
 initPaymentTransaction(sequelize);
 initInvoice(sequelize);
 initTarifGrid(sequelize); // ✅ ADD THIS
+initReclamation(sequelize)
 
+
+UserModel.hasMany(Reclamation, {
+    foreignKey: "clientId",
+    as: "reclamations",
+});
+
+UserModel.hasMany(Reclamation, {
+    foreignKey: "adminId",
+    as: "handledReclamations",
+});
+
+
+Reclamation.belongsTo(UserModel, {
+    foreignKey: "clientId",
+    as: "client",
+});
+
+Reclamation.belongsTo(UserModel, {
+    foreignKey: "adminId",
+    as: "admin",
+});
 
 
 TarifGridModel.hasMany(ParkingLots, {

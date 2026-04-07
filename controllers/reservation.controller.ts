@@ -43,6 +43,8 @@ export const createReservation = async (req: AuthRequest, res: Response) => {
         const diffInMinutes = Math.floor(
             (endDate.getTime() - startDate.getTime()) / (1000 * 60)
         );
+        console.log("xxxxxxxxxxxxxxxxxxxxx",parking.tarifGrid)
+
         const totalPrice = calculatePrice(
             diffInMinutes,
             parking.tarifGrid.dataValues.grid
@@ -56,6 +58,9 @@ export const createReservation = async (req: AuthRequest, res: Response) => {
         }
 
         // Validate ENUM
+
+
+
         if (status && !Object.values(ReservationStatus).includes(status)) {
             return res.status(400).json({
                 message: `Invalid status. Allowed: ${Object.values(ReservationStatus).join(", ")}`

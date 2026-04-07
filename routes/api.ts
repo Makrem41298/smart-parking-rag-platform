@@ -10,6 +10,13 @@ import {createPlanParkingLot, deletePlanParkingLot, getAllPlanParkingLots, getPl
 import {createSubscription, getAllSubscriptions, getSubscriptionById} from "../controllers/subscription.controller";
 import {requireRole} from "../middlewares/role.middleware";
 import {Role} from "../models/enum.type";
+import {
+    createReclamation,
+    deleteReclamation,
+    getAllReclamations,
+    getReclamationById,
+    updateReclamation
+} from "../controllers/reclamation.controller";
 
 
 export default function routes(app: Application): void {
@@ -71,4 +78,15 @@ export default function routes(app: Application): void {
     app.post("/subscriptions",authMiddleware,requireRole([Role.CLIENT]), createSubscription);
     app.get("/subscriptions",authMiddleware, getAllSubscriptions);
     app.get("/subscriptions/:id",authMiddleware, getSubscriptionById);
+//Reclamation
+
+    app.post("/reclamation",authMiddleware,createReclamation)
+    app.get("/reclamation/:id",authMiddleware,getReclamationById)
+    app.get("/reclamation",authMiddleware,getAllReclamations)
+    app.delete("/reclamation/:id",authMiddleware,deleteReclamation)
+    app.put("/reclamation/:id",authMiddleware,updateReclamation)
+
+
+
+
 }

@@ -34,3 +34,9 @@ export enum PaymentStatus {
     REFUSED= "FAILED",
     PENDING= "PENDING",
 }
+
+export enum ReclamationStatus {
+    IN_PROGRESS = "IN_PROGRESS",
+    RESOLVED = "RESOLVED",
+    REJECTED = "REJECTED"
+}

@@ -2,13 +2,17 @@ import dotenv from "dotenv";
 import express, { Application } from "express";
 import routes from "./routes/api";
 import sequelize  from "./models/index";
+import cors from "cors";
 
 dotenv.config();
 const app: Application = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cors({
+    origin: "http://localhost:5173", // your React app
+    credentials: true
+}));
 const port: number = Number(process.env.PORT) || 3000;
 
 console.log("DATABASE_URL =", process.env.DB_HOST);
