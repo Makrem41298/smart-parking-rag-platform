@@ -1,4 +1,4 @@
-import {AuthRequest, JwtUser} from "../middlewares/auth.middleware";
+import {AuthRequest} from "../middlewares/auth.middleware";
 import {Response} from "express";
 import {Reclamation} from "../models/reclamation.model";
 import {ReclamationStatus, Role} from "../models/enum.type";
@@ -27,10 +27,9 @@ export const createReclamation = async (req: AuthRequest, res: Response) => {
             subject:subject
         });
 
-        return res.status(201).json({
-            message: "Reclamation created successfully",
-            data: reclamation
-        });
+        return res.status(201).json(
+           reclamation
+        );
 
     } catch (error) {
         console.error("Create Reclamation Error:", error);
@@ -96,15 +95,21 @@ export const updateReclamation = async (req: AuthRequest, res: Response) => {
                 status: status,
             });
 
-            return res.status(200).json({
-                message: "Reclamation resolved successfully",
-                data: reclamation,
-            });
+            return res.status(200).json(
+              reclamation
+            );
         }
 
         // ================= CLIENT =================
         // 🔹 Check ownership
-        if (reclamation.clientId !== user.id) {
+
+
+
+
+
+        if (reclamation.clientId != user.id) {
+            console.log("id clinet ",reclamation.clientId )
+            console.log("id clinet ",user.id)
             return res.status(403).json({
                 message: "Forbidden: You can't update this reclamation",
             });
@@ -121,10 +126,9 @@ export const updateReclamation = async (req: AuthRequest, res: Response) => {
             content: content.trim(),
         });
 
-        return res.status(200).json({
-            message: "Reclamation updated successfully",
-            data: reclamation,
-        });
+        return res.status(200).json(
+           reclamation
+        );
 
     } catch (error) {
         console.error("Update Reclamation Error:", error);
@@ -141,7 +145,7 @@ export const getAllReclamations = async (req: AuthRequest, res: Response) => {
                 message: "Unauthorized: User not authenticated"
             })
         }
-        const whereCondition = user.role === Role.ADMIN ? {} : { userId: user.id};
+        const whereCondition = user.role === Role.ADMIN ? {} : { clientId: user.id};
 
 
         const reclamations = await Reclamation.findAll({
@@ -162,10 +166,9 @@ export const getAllReclamations = async (req: AuthRequest, res: Response) => {
 
 
 
-        return res.status(200).json({
-            message: "Reclamations found successfully",
-            data: reclamations
-        })
+        return res.status(200).json(
+           reclamations
+        )
 
 
 
@@ -187,7 +190,7 @@ export const getReclamationById = async (req: AuthRequest, res: Response) => {
               message: "Unauthorized: User not authenticated"
           })
       }
-      const whereCondition = user.role === Role.ADMIN ? {id:id} : { userId: user.id ,id:id};
+      const whereCondition = user.role === Role.ADMIN ? {id:id} : { clientId: user.id ,id:id};
 
 
       const reclamation = await Reclamation.findOne({
@@ -207,13 +210,12 @@ export const getReclamationById = async (req: AuthRequest, res: Response) => {
       })
       if (!reclamation) {
           return res.status(401).json({
-              message: "Resource not found"
+              message: "Reclamation not found"
           })
       }
-      return res.status(201).json({
-          message: "Reclamation found successfully",
-          data: reclamation
-      })
+      return res.status(201).json(
+          reclamation
+      )
 
   }catch (error) {
       console.error("Getting Reclamation Error:", error);
@@ -246,14 +248,14 @@ export const deleteReclamation = async (req: AuthRequest, res: Response) => {
         })
         if (!reclamation) {
             return res.status(401).json({
-                message: "Resource not found"
+                message: "Reclamation not found"
             })
         }
 
         if (userRole === Role.CLIENT) {
             if (reclamation.status!==ReclamationStatus.IN_PROGRESS){
                 return res.status(401).json({
-                    message: "impossible delete this reclamation",
+                    message: "impossible delete this reclamation is not in progress",
                 })
             }
         }

@@ -1,12 +1,35 @@
-import { Application } from "express";
+import {Application} from "express";
 import {changePassword, getProfile, login, logout, refreshToken, register} from "../controllers/auth.controller";
 import {authMiddleware} from "../middlewares/auth.middleware";
-import {createTarifGrid, deleteTarifGrid, getAllTarifGrids, getTarifGridById, updateTarifGrid} from "../controllers/tarifGrid.controller";
-import {createParkingLot, deleteParkingLot, getAllParkingLots, getParkingLotById, updateParkingLot} from "../controllers/parkingLot.controller";
+import {
+    createTarifGrid,
+    deleteTarifGrid,
+    getAllTarifGrids,
+    getTarifGridById,
+    updateTarifGrid
+} from "../controllers/tarifGrid.controller";
+import {
+    createParkingLot,
+    deleteParkingLot,
+    getAllParkingLots,
+    getParkingLotById,
+    updateParkingLot
+} from "../controllers/parkingLot.controller";
 import {getAllUsers, getUserById, updateStatusUser} from "../controllers/user.controller";
-import {createReservation, getAllReservations, getReservationById, updateReservation} from "../controllers/reservation.controller";
-import { createPlan, deletePlan, getAllPlans, getPlanById, updatePlan } from "../controllers/plan.controller";
-import {createPlanParkingLot, deletePlanParkingLot, getAllPlanParkingLots, getPlanParkingLotById, updatePlanParkingLot} from "../controllers/planParkingLot.controller";
+import {
+    createReservation,
+    getAllReservations,
+    getReservationById,
+    updateReservation
+} from "../controllers/reservation.controller";
+import {createPlan, deletePlan, getAllPlans, getPlanById, updatePlan} from "../controllers/plan.controller";
+import {
+    createPlanParkingLot,
+    deletePlanParkingLot,
+    getAllPlanParkingLots,
+    getPlanParkingLotById,
+    updatePlanParkingLot
+} from "../controllers/planParkingLot.controller";
 import {createSubscription, getAllSubscriptions, getSubscriptionById} from "../controllers/subscription.controller";
 import {requireRole} from "../middlewares/role.middleware";
 import {Role} from "../models/enum.type";
@@ -80,9 +103,9 @@ export default function routes(app: Application): void {
     app.get("/subscriptions/:id",authMiddleware, getSubscriptionById);
 //Reclamation
 
-    app.post("/reclamation",authMiddleware,createReclamation)
+    app.post("/reclamation",authMiddleware,requireRole([Role.CLIENT]),createReclamation)
     app.get("/reclamation/:id",authMiddleware,getReclamationById)
-    app.get("/reclamation",authMiddleware,getAllReclamations)
+    app.get("/reclamations",authMiddleware,getAllReclamations)
     app.delete("/reclamation/:id",authMiddleware,deleteReclamation)
     app.put("/reclamation/:id",authMiddleware,updateReclamation)
 
