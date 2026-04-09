@@ -15,7 +15,7 @@ import {
     getParkingLotById,
     updateParkingLot
 } from "../controllers/parkingLot.controller";
-import {getAllUsers, getUserById, updateStatusUser} from "../controllers/user.controller";
+import {createAdmin, getAllUsers, getUserById, updateUser} from "../controllers/user.controller";
 import {
     createReservation,
     getAllReservations,
@@ -60,42 +60,43 @@ export default function routes(app: Application): void {
 
 
 //tariff grids
-    app.post("/tarif-grid", authMiddleware,requireRole([Role.ADMIN]), createTarifGrid);
+    app.post("/tarif-grid", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), createTarifGrid);
     app.get("/tarif-grid", getAllTarifGrids);
     app.get("/tarif-grid/:id", getTarifGridById);
-    app.put("/tarif-grid/:id", authMiddleware,requireRole([Role.ADMIN]), updateTarifGrid);
-    app.delete("/tarif-grid/:id", authMiddleware,requireRole([Role.ADMIN]), deleteTarifGrid);
+    app.put("/tarif-grid/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), updateTarifGrid);
+    app.delete("/tarif-grid/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), deleteTarifGrid);
 
 
 //parking Lots
-    app.post("/parking-lot", authMiddleware,requireRole([Role.ADMIN]), createParkingLot);
+    app.post("/parking-lot", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), createParkingLot);
     app.get("/parking-lot", getAllParkingLots);
     app.get("/parking-lot/:id", getParkingLotById);
-    app.put("/parking-lot/:id", authMiddleware,requireRole([Role.ADMIN]), updateParkingLot);
-    app.delete("/parking-lot/:id", authMiddleware,requireRole([Role.ADMIN]), deleteParkingLot);
+    app.put("/parking-lot/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), updateParkingLot);
+    app.delete("/parking-lot/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), deleteParkingLot);
 
 
 //users
-    app.get("/users", authMiddleware,requireRole([Role.ADMIN]), getAllUsers);
-    app.get("/users/:id", authMiddleware,requireRole([Role.ADMIN]), getUserById);
-    app.put("/users/:id", authMiddleware,requireRole([Role.ADMIN]), updateStatusUser);
+    app.get("/users", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), getAllUsers);
+    app.get("/users/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), getUserById);
+    app.put("/users/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), updateUser);
+    app.post("/users", authMiddleware,requireRole([Role.SUPER_ADMIN]), createAdmin);
 //reservations
     app.post("/reservations", authMiddleware,requireRole([Role.CLIENT]), createReservation);
     app.get("/reservations",authMiddleware, getAllReservations);
     app.get("/reservations/:id",authMiddleware, getReservationById);
     app.put("/reservations/:id",authMiddleware, updateReservation);
 // plans
-    app.post("/plans", authMiddleware,requireRole([Role.ADMIN]), createPlan);
-    app.get("/plans", authMiddleware,requireRole([Role.ADMIN]), getAllPlans);
-    app.get("/plans/:id", authMiddleware,requireRole([Role.ADMIN]), getPlanById);
-    app.put("/plans/:id", authMiddleware,requireRole([Role.ADMIN]), updatePlan);
-    app.delete("/plans/:id", authMiddleware,requireRole([Role.ADMIN]), deletePlan);
+    app.post("/plans", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), createPlan);
+    app.get("/plans", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), getAllPlans);
+    app.get("/plans/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), getPlanById);
+    app.put("/plans/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), updatePlan);
+    app.delete("/plans/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), deletePlan);
 //parking 's plan
-    app.post("/plan-parking-lot", authMiddleware,requireRole([Role.ADMIN]), createPlanParkingLot);
+    app.post("/plan-parking-lot", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), createPlanParkingLot);
     app.get("/plan-parking-lot", getAllPlanParkingLots);
     app.get("/plan-parking-lot/:id", getPlanParkingLotById);
-    app.put("/plan-parking-lot/:id", authMiddleware,requireRole([Role.ADMIN]), updatePlanParkingLot);
-    app.delete("/plan-parking-lot/:id", authMiddleware,requireRole([Role.ADMIN]), deletePlanParkingLot);
+    app.put("/plan-parking-lot/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), updatePlanParkingLot);
+    app.delete("/plan-parking-lot/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), deletePlanParkingLot);
 
 //subscription
     app.post("/subscriptions",authMiddleware,requireRole([Role.CLIENT]), createSubscription);
