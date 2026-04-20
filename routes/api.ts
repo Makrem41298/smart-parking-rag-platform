@@ -40,15 +40,11 @@ import {
     getReclamationById,
     updateReclamation
 } from "../controllers/reclamation.controller";
+import {agentResponse} from "../tools/agent.tool";
 
 
 export default function routes(app: Application): void {
-    app.get("/", (req, res) => {
-        res.send({
-            status: "success",
-            message: "Welcome back!",
-        })
-    });
+
 
     //auth users
     app.post("/register", register);
@@ -109,6 +105,9 @@ export default function routes(app: Application): void {
     app.get("/reclamations",authMiddleware,getAllReclamations)
     app.delete("/reclamation/:id",authMiddleware,deleteReclamation)
     app.put("/reclamation/:id",authMiddleware,updateReclamation)
+
+
+    app.post("/agent",authMiddleware,requireRole([Role.SUPER_ADMIN,Role.ADMIN]),agentResponse)
 
 
 
