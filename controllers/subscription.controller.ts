@@ -1,7 +1,7 @@
-import {  Response } from "express";
-import { SubscriptionModel } from "../models/subscription.model";
-import { UserModel } from "../models/user.model";
-import { PlanParkingLotModel } from "../models/planParkingLot.model";
+import {Response} from "express";
+import {SubscriptionModel} from "../models/subscription.model";
+import {UserModel} from "../models/user.model";
+import {PlanParkingLotModel} from "../models/planParkingLot.model";
 import {Role} from "../models/enum.type";
 import {AuthRequest} from "../middlewares/auth.middleware";
 import {PlanModel} from "../models/plan.model";
@@ -64,8 +64,10 @@ export const getAllSubscriptions = async (_req: AuthRequest, res: Response) => {
         if (!_req.user) {
             return res.status(401).json({ message: "Unauthorized" });
         }
-        const whereCondition = _req.user?.role === Role.ADMIN ? {} : { userId: _req.user.id };
-
+        const whereCondition =
+            _req.user?.role === Role.ADMIN || _req.user?.role === Role.SUPER_ADMIN
+                ? {}
+                : { userId: _req.user.id };
         const subscriptions = await SubscriptionModel.findAll({
             where: whereCondition,
             include: [
@@ -92,7 +94,7 @@ export const getSubscriptionById = async (req: AuthRequest, res: Response) => {
         if (!req.user) {
             return res.status(401).json({ message: "Unauthorized" });
         }
-        const whereCondition = req.user.role === Role.ADMIN ? {id:id} : { userId: req.user.id ,id:id};
+        const whereCondition =  req.user?.role === Role.ADMIN || req.user?.role === Role.SUPER_ADMIN? {id:id} : { userId: req.user.id ,id:id};
 
 
 

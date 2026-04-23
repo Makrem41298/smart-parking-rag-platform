@@ -92,7 +92,7 @@ export const getAllReservations = async (_req: AuthRequest, res: Response) => {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        const whereCondition = _req.user.role === Role.ADMIN ? {} : { userId: _req.user.id };
+        const whereCondition =  _req.user?.role === Role.ADMIN || _req.user?.role === Role.SUPER_ADMIN? {} : { userId: _req.user.id };
 
         const reservations = await ReservationModel.findAll({
             where: whereCondition,
@@ -121,7 +121,7 @@ export const getReservationById = async (req: AuthRequest, res: Response) => {
         if (!req.user) {
             return res.status(401).json({ message: "Unauthorized" });
         }
-        const whereCondition = req.user.role === Role.ADMIN ? {id:id} : { userId: req.user.id ,id:id};
+        const whereCondition =  req.user?.role === Role.ADMIN || req.user?.role === Role.SUPER_ADMIN? {id:id} : { userId: req.user.id ,id:id};
         const reservation = await ReservationModel.findOne({
             where: whereCondition,
             include: [
@@ -149,7 +149,7 @@ export const updateReservation = async (req: AuthRequest, res: Response) => {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        const whereCondition = req.user.role === Role.ADMIN ? {id:id} : { userId: req.user.id ,id:id};
+        const whereCondition =  req.user?.role === Role.ADMIN || req.user?.role === Role.SUPER_ADMIN ? {id:id} : { userId: req.user.id ,id:id};
         const reservation = await ReservationModel.findOne({
             where: whereCondition,
             include: [

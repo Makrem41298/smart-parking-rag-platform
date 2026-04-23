@@ -145,7 +145,7 @@ export const getAllReclamations = async (req: AuthRequest, res: Response) => {
                 message: "Unauthorized: User not authenticated"
             })
         }
-        const whereCondition = user.role === Role.ADMIN ? {} : { clientId: user.id};
+        const whereCondition =  req.user?.role === Role.ADMIN || req.user?.role === Role.SUPER_ADMIN? {} : { clientId: user.id};
 
 
         const reclamations = await Reclamation.findAll({
@@ -190,7 +190,7 @@ export const getReclamationById = async (req: AuthRequest, res: Response) => {
               message: "Unauthorized: User not authenticated"
           })
       }
-      const whereCondition = user.role === Role.ADMIN ? {id:id} : { clientId: user.id ,id:id};
+      const whereCondition =  user?.role === Role.ADMIN || user?.role === Role.SUPER_ADMIN? {id:id} : { clientId: user.id ,id:id};
 
 
       const reclamation = await Reclamation.findOne({
