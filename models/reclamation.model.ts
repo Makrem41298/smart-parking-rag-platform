@@ -2,7 +2,11 @@ import { Model,Sequelize,DataTypes,Optional } from 'sequelize';
 import {ReclamationStatus} from "./enum.type";
 
 
-
+export interface ConversationHistoryMessage {
+  sender: string;
+  message: string;
+  date: Date;
+}
 export interface ReclamationAttributes {
   id: number;
   clientId: number;
@@ -11,8 +15,10 @@ export interface ReclamationAttributes {
   content: string;
   solution: string|null;
   status: ReclamationStatus;
+  conversationHistory: ConversationHistoryMessage[];
 }
-interface ReclamationCreationAttributes extends Optional<ReclamationAttributes, 'id'|"status"> {}
+interface ReclamationCreationAttributes extends Optional<ReclamationAttributes,     "id" | "adminId" | "subject" | "solution" | "conversationHistory"
+> {}
 
 export class Reclamation extends Model<ReclamationAttributes,ReclamationCreationAttributes> implements ReclamationAttributes {
      declare id: number;
@@ -22,6 +28,7 @@ export class Reclamation extends Model<ReclamationAttributes,ReclamationCreation
      declare content: string;
      declare solution: string;
      declare status: ReclamationStatus;
+     declare conversationHistory: ConversationHistoryMessage[]
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -68,7 +75,13 @@ export class Reclamation extends Model<ReclamationAttributes,ReclamationCreation
           type:DataTypes.ENUM(...Object.values(ReclamationStatus)),
             allowNull: false,
             defaultValue: ReclamationStatus.IN_PROGRESS,
-        }
+        },
+      conversationHistory: {
+        type:DataTypes.JSON,
+        allowNull: true,
+        defaultValue: [],
+
+      }
 
     }, {
       sequelize,

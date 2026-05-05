@@ -43,6 +43,11 @@ export const up: Migration["up"] = async (queryInterface: QueryInterface) => {
       allowNull: false,
       defaultValue: ReclamationStatus.IN_PROGRESS,
     },
+    conversationHistory: {
+      type:DataTypes.JSON,
+      allowNull: true,
+      defaultValue: [],
+    },
     createdAt: {
       allowNull: false,
       type: DataTypes.DATE,

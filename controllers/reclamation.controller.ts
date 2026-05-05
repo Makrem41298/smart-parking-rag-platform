@@ -22,9 +22,11 @@ export const createReclamation = async (req: AuthRequest, res: Response) => {
         }
 
         const reclamation = await Reclamation.create({
-            content: content.trim(),
             clientId: userId,
-            subject:subject
+            subject: subject?.trim() || null,
+            content: content.trim(),
+            status: ReclamationStatus.IN_PROGRESS,
+
         });
 
         return res.status(201).json(

@@ -41,8 +41,10 @@ import {
     updateReclamation
 } from "../controllers/reclamation.controller";
 import {agentResponse} from "../tools/agent.tool";
+import sequelize from "../models";
+import { QueryTypes } from "sequelize";
 
-
+import {  Request, Response } from "express";
 export default function routes(app: Application): void {
 
 
@@ -87,7 +89,7 @@ export default function routes(app: Application): void {
     app.get("/plans/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), getPlanById);
     app.put("/plans/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), updatePlan);
     app.delete("/plans/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), deletePlan);
-//parking 's plan
+//parking's plan
     app.post("/plan-parking-lot", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), createPlanParkingLot);
     app.get("/plan-parking-lot", getAllPlanParkingLots);
     app.get("/plan-parking-lot/:id", getPlanParkingLotById);
@@ -107,9 +109,4 @@ export default function routes(app: Application): void {
     app.put("/reclamation/:id",authMiddleware,updateReclamation)
 
 
-    app.post("/agent",authMiddleware,requireRole([Role.SUPER_ADMIN,Role.ADMIN]),agentResponse)
-
-
-
-
-}
+    app.post("/agent",authMiddleware,requireRole([Role.SUPER_ADMIN,Role.ADMIN]),agentResponse)}

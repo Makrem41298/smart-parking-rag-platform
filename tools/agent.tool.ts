@@ -2,6 +2,7 @@ import axios from "axios";
 import { Response,Request} from "express";
 import {AuthRequest} from "../middlewares/auth.middleware";
 import dotenv from "dotenv";
+import {Reclamation} from "../models/reclamation.model";
 
 
 
@@ -11,16 +12,37 @@ export const agentResponse = async (req: AuthRequest, res: Response) => {
     try {
         console.log("Token:", req.headers.authorization);
         dotenv.config();
-        console.log(req.body);
-        const response = await axios.post(
 
+        const {question,reclamationId,generationResponse,generalResponse} = req.body;
+
+        const reclamation = await Reclamation.findByPk(reclamationId);
+
+
+
+        if (!reclamation) {
+            return res.status(404).json({
+                message: "Reclamation not found"
+            });
+        }
+        let updatedHistory = [
+            ...(reclamation.conversationHistory || []),
+            {
+                sender: "HumanMessage",
+                message: question,
+                date: new Date(),
+            },
+        ];
+        console.log("updatedHistory",updatedHistory)
+
+        const response = await axios.post(
 
             process.env.AGENT_SERVICE_URL + "/agent",
             {
-                question: req.body.question,
-                userId:req.body.userId,
-                generationResponse:req.body.generationResponse,
-                generalResponse:req.body.generalResponse,
+                question: question,
+                userId:reclamation.clientId,
+                reclamationId:reclamationId,
+                generationResponse:generationResponse,
+                generalResponse:generalResponse,
             },
             {
                 headers: {
@@ -28,8 +50,27 @@ export const agentResponse = async (req: AuthRequest, res: Response) => {
                 }
             }
         );
+         updatedHistory = [
+            ...(updatedHistory|| []),
+            {
+                sender: "IAMessage:",
+                message: response.data.answer,
+                date: new Date(),
+            },
+        ];
+
+
+        console.log("updatedHistory",updatedHistory)
+
+        await reclamation.update({
+            conversationHistory: updatedHistory,
+        });
+
+
+
 
         return res.status(200).json(response.data);
+
 
     } catch (error: any) {
         console.error(error?.response?.data || error.message);
