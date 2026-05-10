@@ -12,8 +12,12 @@ export const agentResponse = async (req: AuthRequest, res: Response) => {
     try {
         console.log("Token:", req.headers.authorization);
         dotenv.config();
+        console.log(req.body)
+        const {question,reclamationId,modeResponse} = req.body;
 
-        const {question,reclamationId,generationResponse,generalResponse} = req.body;
+
+
+
 
         const reclamation = await Reclamation.findByPk(reclamationId);
 
@@ -32,17 +36,15 @@ export const agentResponse = async (req: AuthRequest, res: Response) => {
                 date: new Date(),
             },
         ];
-        console.log("updatedHistory",updatedHistory)
 
         const response = await axios.post(
 
             process.env.AGENT_SERVICE_URL + "/agent",
             {
                 question: question,
-                userId:reclamation.clientId,
-                reclamationId:reclamationId,
-                generationResponse:generationResponse,
-                generalResponse:generalResponse,
+                userId:Number(reclamation.clientId),
+                reclamationId:Number(reclamationId),
+                mode_response:modeResponse,
             },
             {
                 headers: {
@@ -60,7 +62,6 @@ export const agentResponse = async (req: AuthRequest, res: Response) => {
         ];
 
 
-        console.log("updatedHistory",updatedHistory)
 
         await reclamation.update({
             conversationHistory: updatedHistory,
