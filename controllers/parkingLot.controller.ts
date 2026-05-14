@@ -21,17 +21,21 @@ export const createParkingLot = async (req: Request, res: Response) => {
 
         if (!name || !address || !city || !country || !numberOfPlaces) {
             return res.status(400).json({
-                message: "Missing required fields: name, address, city, country, numberOfPlaces"
+                message: "Missing required fields"
             });
         }
 
-        // Validate tarifGridId if provided
         if (tarifGridId) {
             const grid = await TarifGridModel.findByPk(tarifGridId);
             if (!grid) {
                 return res.status(400).json({ message: "Invalid tarifGridId" });
             }
         }
+
+        const imageUrl: string | undefined = req.file
+            ? `/uploads/parking-lots/${req.file.filename}`
+            : undefined;
+
 
         const parking = await ParkingLots.create({
             name,
@@ -40,10 +44,13 @@ export const createParkingLot = async (req: Request, res: Response) => {
             country,
             covered,
             numberOfPlaces,
+            numberOfPlaceAvailable: numberOfPlaces,
             description,
             tarifGridId,
             reservationAvailability,
-            subscriptionAvailability
+            subscriptionAvailability,
+
+            url_image: imageUrl
         });
 
         return res.status(201).json(parking);
@@ -52,7 +59,6 @@ export const createParkingLot = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
-
 // Get all parking lots
 export const getAllParkingLots = async (_req: Request, res: Response) => {
     try {
@@ -115,18 +121,20 @@ export const updateParkingLot = async (req: Request, res: Response) => {
             subscriptionAvailability
         } = req.body;
 
-        // Validate statusParking
         if (statusParking && !Object.values(ParkingStatus).includes(statusParking)) {
             return res.status(400).json({ message: "Invalid parking status" });
         }
 
-        // Validate tarifGridId
         if (tarifGridId) {
             const grid = await TarifGridModel.findByPk(tarifGridId);
             if (!grid) {
                 return res.status(400).json({ message: "Invalid tarifGridId" });
             }
         }
+
+        const imageUrl: string | undefined = req.file
+            ? `/uploads/parking-lots/${req.file.filename}`
+            : parking.url_image;
 
         await parking.update({
             name,
@@ -140,7 +148,8 @@ export const updateParkingLot = async (req: Request, res: Response) => {
             statusParking,
             tarifGridId,
             reservationAvailability,
-            subscriptionAvailability
+            subscriptionAvailability,
+            url_image: imageUrl
         });
 
         return res.status(200).json(parking);
@@ -149,7 +158,6 @@ export const updateParkingLot = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
-
 // Delete parking lot
 export const deleteParkingLot = async (req: Request, res: Response) => {
     try {

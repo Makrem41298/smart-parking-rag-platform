@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 .env
+uploads
+temp
 *.local
 
 
@@ -24,3 +26,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+

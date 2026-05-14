@@ -26,6 +26,7 @@ export interface ParkingLotAttributes {
     tarifGridId: number | null;
     reservationAvailability: boolean;
     subscriptionAvailability: boolean;
+    url_image:string
 }
 
 interface ParkingLotCreationAttributes
@@ -38,6 +39,7 @@ interface ParkingLotCreationAttributes
         | "subscriptionAvailability"
         | "tarifGridId"
         | "description"
+        |"url_image"
     > {}
 
 export class ParkingLots
@@ -58,6 +60,8 @@ export class ParkingLots
     declare subscriptionAvailability: boolean;
     declare tarifGridId: ForeignKey<TarifGridModel["id"]> | null;
     declare tarifGrid:dataValues;
+    declare url_image: string;
+
 }
 
 export const initParkingLotModel = (sequelize: Sequelize): void => {
@@ -127,6 +131,10 @@ export const initParkingLotModel = (sequelize: Sequelize): void => {
                 onDelete: "SET NULL",
                 onUpdate: "CASCADE",
             },
+            url_image: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            }
         },
         {
             sequelize,
