@@ -3,10 +3,14 @@ import express, { Application } from "express";
 import routes from "./routes/api";
 import sequelize  from "./models/index";
 import cors from "cors";
+import path from "node:path";
 
 dotenv.config();
 const app: Application = express();
-
+app.use(
+    "/uploads",
+    express.static(path.join(process.cwd(), "uploads"))
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({

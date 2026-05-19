@@ -81,6 +81,12 @@ module.exports = {
         onDelete: "SET NULL",
       },
 
+      url_image: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      }
+
+    ,
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE,

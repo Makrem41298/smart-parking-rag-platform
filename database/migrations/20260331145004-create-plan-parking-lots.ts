@@ -59,6 +59,7 @@ module.exports = {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
+
     });
 
 

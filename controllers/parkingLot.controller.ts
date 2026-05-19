@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ParkingLots } from "../models/parkingLot.model";
 import { ParkingStatus } from "../models/enum.type";
 import { TarifGridModel } from "../models/tarifGrid.model";
+import {PlanParkingLotModel} from "../models/planParkingLot.model";
 
 // Create a parking lot
 export const createParkingLot = async (req: Request, res: Response) => {
@@ -80,7 +81,7 @@ export const getParkingLotById = async (req: Request, res: Response) => {
 
         // @ts-ignore
         const parking = await ParkingLots.findByPk(id, {
-            include: [{ model: TarifGridModel, as: "tarifGrid" }]
+            include: [{ model: TarifGridModel, as: "tarifGrid" },{model:PlanParkingLotModel,as :"planParkingLots"}]
         });
 
         if (!parking) {

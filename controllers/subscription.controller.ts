@@ -2,7 +2,7 @@ import {Response} from "express";
 import {SubscriptionModel} from "../models/subscription.model";
 import {UserModel} from "../models/user.model";
 import {PlanParkingLotModel} from "../models/planParkingLot.model";
-import {Role} from "../models/enum.type";
+import {Role, SubscriptionStatus} from "../models/enum.type";
 import {AuthRequest} from "../middlewares/auth.middleware";
 import {PlanModel} from "../models/plan.model";
 
@@ -119,3 +119,70 @@ export const getSubscriptionById = async (req: AuthRequest, res: Response) => {
 
 
 
+export const updateSubscription = async (req: AuthRequest, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+
+
+
+
+        if (!status) {
+            return res.status(400).json({ message: "Status is required" });
+        }
+
+        if (!Object.values(SubscriptionStatus).includes(status)) {
+            return res.status(400).json({
+                message: `Invalid status. Allowed values: ${Object.values(SubscriptionStatus).join(", ")}`
+            });
+        }
+
+        if (status === SubscriptionStatus.EXPIRED) {
+            return res.status(400).json({
+                message: "You cannot manually set subscription as expired"
+            });
+        }
+
+        // @ts-ignore
+        const subscription = await SubscriptionModel.findByPk(id);
+        if (req.user?.role==Role.CLIENT){
+            if (subscription.userId!=req.user?.id){
+                return res.status(400).json({ message: "Unauthorized" });
+            }
+        }
+
+
+
+        if (!subscription) {
+            return res.status(404).json({ message: "Subscription not found" });
+        }
+
+        if (subscription.status === SubscriptionStatus.CANCELED) {
+            return res.status(400).json({
+                message: "Subscription is already canceled"
+            });
+        }
+
+        if (subscription.endDate < new Date()) {
+            return res.status(400).json({
+                message: "Subscription already expired"
+            });
+        }
+
+        await subscription.update({ status });
+
+        return res.status(200).json({
+            message: "Subscription updated successfully",
+            subscription
+        });
+
+    } catch (error) {
+        console.error("Error updating subscription:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+            error
+        });
+    }
+};

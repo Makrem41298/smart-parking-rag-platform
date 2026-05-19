@@ -3,8 +3,9 @@ import { Response,Request} from "express";
 import {AuthRequest} from "../middlewares/auth.middleware";
 import dotenv from "dotenv";
 import {Reclamation} from "../models/reclamation.model";
-
-
+import multer from "multer";
+import FormData from "form-data";
+import fs from "fs";
 
 
 
@@ -81,6 +82,143 @@ export const agentResponse = async (req: AuthRequest, res: Response) => {
         });
     }
 };
+export const uploadFiles = async (req: AuthRequest, res: Response) => {
+    try {
+        const files = req.files as Express.Multer.File[];
+
+        if (!files || files.length === 0) {
+            return res.status(400).json({
+                message: "No files uploaded",
+            });
+        }
+
+        const formData = new FormData();
+
+        files.forEach((file) => {
+            formData.append("files", fs.createReadStream(file.path), {
+                filename: file.originalname,
+                contentType: file.mimetype,
+            });
+        });
+
+        const response = await axios.post(
+            "http://localhost:8000/save-files",
+            formData,
+
+            {
+
+                headers: {
+                    ...formData.getHeaders(),
+                    Authorization: req.headers.authorization,
+                }
+
+            }
+        );
+
+        files.forEach((file) => fs.unlinkSync(file.path));
+
+        return res.json(response.data);
+    } catch (error: any) {
+        return res.status(500).json({
+            message: "Upload failed",
+            error: error.message,
+        });
+    }
+};
+export const getFiles = async (req: Request, res: Response) => {
+    try {
+        const response = await axios.get("http://localhost:8000/files", {
+            headers: {
+                Authorization: req.headers.authorization,
+            },
+        });
+
+        return res.json(response.data);
+    } catch (error: any) {
+        return res.status(500).json({
+            message: "Failed to fetch files",
+            error: error.message,
+        });
+    }
+};
 
 
+const FASTAPI_URL = "http://localhost:8000";
 
+export const deleteFiles = async (req: Request, res: Response) => {
+    try {
+        const { filenames } = req.body;
+
+        const response = await axios.post(
+            `${FASTAPI_URL}/files/delete-batch`,
+            { filenames },
+            {
+                headers: {
+                    Authorization: req.headers.authorization,
+                },
+            }
+        );
+
+        return res.json(response.data);
+    } catch (error: any) {
+        return res.status(500).json({
+            message: "Failed to delete files",
+            error: error.message,
+        });
+    }
+};
+
+export const downloadFile = async (req: Request, res: Response) => {
+    try {
+        const { filename } = req.params;
+
+        const response = await axios.get(
+            // @ts-ignore
+            `${FASTAPI_URL}/files/${encodeURIComponent(filename)}/download`,
+            {
+                responseType: "stream",
+                headers: {
+                    Authorization: req.headers.authorization,
+                },
+            }
+        );
+
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${filename}"`
+        );
+
+        response.data.pipe(res);
+    } catch (error: any) {
+        return res.status(500).json({
+            message: "Failed to download file",
+            error: error.message,
+        });
+    }
+};
+
+
+export const getVectorstoreStatus = async (
+    req: Request,
+    res: Response
+) => {
+    try {
+        const response = await axios.get(
+            "http://localhost:8000/vectorstore/status",
+            {
+                headers: {
+                    Authorization: req.headers.authorization,
+                },
+            }
+        );
+
+        return res.json(response.data);
+
+    } catch (error: any) {
+
+        return res.status(500).json({
+            message: "Failed to fetch vectorstore status",
+            error: error.message,
+        });
+    }
+};

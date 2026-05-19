@@ -5,9 +5,13 @@ import {UserModel} from "../models/user.model";
 import {ReservationStatus, Role} from "../models/enum.type";
 import {AuthRequest} from "../middlewares/auth.middleware";
 import {TarifGridModel} from "../models/tarifGrid.model";
+import sequelize from "../models";
 
 // Create reservation
+
 export const createReservation = async (req: AuthRequest, res: Response) => {
+    const transaction = await sequelize.transaction();
+
     try {
         const {
             parkingLotId,
@@ -15,76 +19,111 @@ export const createReservation = async (req: AuthRequest, res: Response) => {
             endTimeDate,
             status,
             entryTime,
-            leaveTime
+            leaveTime,
         } = req.body;
 
-       const userId:number|undefined=req.user?.id
+        const userId = req.user?.id;
 
-
-
-
-        // Required fields
-        if (!parkingLotId || !userId || !startTimeDate || !endTimeDate ) {
+        if (!parkingLotId || !userId || !startTimeDate || !endTimeDate) {
+            await transaction.rollback();
             return res.status(400).json({
-                message: "Missing required fields: parkingLotId, userId, startTimeDate, endTimeDate, totalPrice"
+                message: "Missing required fields: parkingLotId, startTimeDate, endTimeDate",
             });
         }
 
-        // Validate FK: parking lot
-        const parking = await ParkingLots.findByPk(parkingLotId,
-            {
-                include: [{ model: TarifGridModel, as: "tarifGrid" }]
-            });
+        const parking = await ParkingLots.findByPk(parkingLotId, {
+            include: [{ model: TarifGridModel, as: "tarifGrid" }],
+            transaction,
+            lock: transaction.LOCK.UPDATE,
+        });
+
         if (!parking) {
+            await transaction.rollback();
             return res.status(400).json({ message: "Invalid parkingLotId" });
         }
+
+        if (!parking.reservationAvailability || parking.numberOfPlaceAvailable <= 0) {
+            await transaction.rollback();
+            return res.status(400).json({
+                message: "Parking lot is not available for reservations",
+            });
+        }
+
         const startDate = new Date(startTimeDate);
         const endDate = new Date(endTimeDate);
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            await transaction.rollback();
+            return res.status(400).json({ message: "Invalid date format" });
+        }
+
+        if (endDate <= startDate) {
+            await transaction.rollback();
+            return res.status(400).json({
+                message: "endTimeDate must be after startTimeDate",
+            });
+        }
+
+        const user = await UserModel.findByPk(userId, { transaction });
+
+        if (!user) {
+            await transaction.rollback();
+            return res.status(400).json({ message: "Invalid userId" });
+        }
+
+        if (status && !Object.values(ReservationStatus).includes(status)) {
+            await transaction.rollback();
+            return res.status(400).json({
+                message: `Invalid status. Allowed: ${Object.values(ReservationStatus).join(", ")}`,
+            });
+        }
+
         const diffInMinutes = Math.floor(
             (endDate.getTime() - startDate.getTime()) / (1000 * 60)
         );
-        console.log("xxxxxxxxxxxxxxxxxxxxx",parking.tarifGrid)
 
         const totalPrice = calculatePrice(
             diffInMinutes,
             parking.tarifGrid.dataValues.grid
         );
-        console.log("PRICE", totalPrice);
 
-        // Validate FK: user
-        const user = await UserModel.findByPk(userId);
-        if (!user) {
-            return res.status(400).json({ message: "Invalid userId" });
-        }
+        const reservation = await ReservationModel.create(
+            {
+                parkingLotId,
+                userId,
+                startTimeDate,
+                endTimeDate,
+                totalPrice,
+                status,
+                entryTime,
+                leaveTime,
+            },
+            { transaction }
+        );
 
-        // Validate ENUM
+        await parking.update(
+            {
+                numberOfPlaceAvailable: parking.numberOfPlaceAvailable - 1,
+            },
+            { transaction }
+        );
 
+        await transaction.commit();
 
-
-        if (status && !Object.values(ReservationStatus).includes(status)) {
-            return res.status(400).json({
-                message: `Invalid status. Allowed: ${Object.values(ReservationStatus).join(", ")}`
-            });
-        }
-
-        const reservation = await ReservationModel.create({
-            parkingLotId,
-            userId,
-            startTimeDate,
-            endTimeDate,
-            totalPrice,
-            status,
-            entryTime,
-            leaveTime
+        return res.status(201).json({
+            message: "Reservation created successfully",
+            reservation,
         });
-
-        return res.status(201).json(reservation);
     } catch (error) {
+        await transaction.rollback();
+
         console.error("Error creating reservation:", error);
-        return res.status(500).json({ message: "Internal server error" });
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
     }
 };
-
 // Get all reservations
 export const getAllReservations = async (_req: AuthRequest, res: Response) => {
     try {

@@ -8,8 +8,14 @@ import {PlanParkingLotModel} from "./planParkingLot.model";
 export interface grids {
     grid:[];
 }
-export interface dataValues {
+export interface plans {
+    plans:[];
+}
+export interface gridsValues {
     dataValues:grids;
+}
+export interface  plansValues{
+    dataValues:plans
 }
 
 export interface ParkingLotAttributes {
@@ -24,6 +30,7 @@ export interface ParkingLotAttributes {
     description: string | null;
     statusParking: ParkingStatus;
     tarifGridId: number | null;
+
     reservationAvailability: boolean;
     subscriptionAvailability: boolean;
     url_image:string
@@ -59,8 +66,9 @@ export class ParkingLots
     declare reservationAvailability: boolean;
     declare subscriptionAvailability: boolean;
     declare tarifGridId: ForeignKey<TarifGridModel["id"]> | null;
-    declare tarifGrid:dataValues;
+    declare tarifGrid:gridsValues;
     declare url_image: string;
+    declare  plans:plansValues
 
 }
 

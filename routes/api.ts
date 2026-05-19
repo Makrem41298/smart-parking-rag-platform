@@ -30,7 +30,7 @@ import {
     getPlanParkingLotById,
     updatePlanParkingLot
 } from "../controllers/planParkingLot.controller";
-import {createSubscription, getAllSubscriptions, getSubscriptionById} from "../controllers/subscription.controller";
+import {createSubscription, getAllSubscriptions, getSubscriptionById, updateSubscription} from "../controllers/subscription.controller";
 import {requireRole} from "../middlewares/role.middleware";
 import {Role} from "../models/enum.type";
 import {
@@ -40,11 +40,19 @@ import {
     getReclamationById,
     updateReclamation
 } from "../controllers/reclamation.controller";
-import {agentResponse} from "../tools/agent.tool";
+import {
+    agentResponse,
+    deleteFiles,
+    downloadFile,
+    getFiles,
+    getVectorstoreStatus,
+    uploadFiles
+} from "../tools/agent.tool";
 import sequelize from "../models";
 import { QueryTypes } from "sequelize";
 
 import {  Request, Response } from "express";
+import multer from "multer";
 export default function routes(app: Application): void {
 
 
@@ -66,10 +74,12 @@ export default function routes(app: Application): void {
 
 
 //parking Lots
-    app.post("/parking-lot", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), createParkingLot);
+    const uploadParking = multer({ dest: "uploads/parking-lots/" });
+
+    app.post("/parking-lot", uploadParking.single("image"), authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), createParkingLot);
     app.get("/parking-lot", getAllParkingLots);
     app.get("/parking-lot/:id", getParkingLotById);
-    app.put("/parking-lot/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), updateParkingLot);
+    app.put("/parking-lot/:id",uploadParking.single("image"),authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), updateParkingLot);
     app.delete("/parking-lot/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), deleteParkingLot);
 
 
@@ -85,8 +95,8 @@ export default function routes(app: Application): void {
     app.put("/reservations/:id",authMiddleware, updateReservation);
 // plans
     app.post("/plans", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), createPlan);
-    app.get("/plans", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), getAllPlans);
-    app.get("/plans/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), getPlanById);
+    app.get("/plans", getAllPlans);
+    app.get("/plans/:id", getPlanById);
     app.put("/plans/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), updatePlan);
     app.delete("/plans/:id", authMiddleware,requireRole([Role.ADMIN,Role.SUPER_ADMIN]), deletePlan);
 //parking's plan
@@ -100,6 +110,7 @@ export default function routes(app: Application): void {
     app.post("/subscriptions",authMiddleware,requireRole([Role.CLIENT]), createSubscription);
     app.get("/subscriptions",authMiddleware, getAllSubscriptions);
     app.get("/subscriptions/:id",authMiddleware, getSubscriptionById);
+    app.put("/subscriptions/:id",authMiddleware,updateSubscription)
 //Reclamation
 
     app.post("/reclamation",authMiddleware,requireRole([Role.CLIENT]),createReclamation)
@@ -108,5 +119,14 @@ export default function routes(app: Application): void {
     app.delete("/reclamation/:id",authMiddleware,deleteReclamation)
     app.put("/reclamation/:id",authMiddleware,updateReclamation)
 
+    const upload = multer({
+        dest: "temp/",
+    });
+    app.post("/upload",authMiddleware,requireRole([Role.SUPER_ADMIN]), upload.array("files"),uploadFiles)
+    app.post("/agent",authMiddleware,requireRole([Role.SUPER_ADMIN,Role.ADMIN]),agentResponse)
+    app.get("/files",authMiddleware,requireRole([Role.SUPER_ADMIN]),getFiles)
 
-    app.post("/agent",authMiddleware,requireRole([Role.SUPER_ADMIN,Role.ADMIN]),agentResponse)}
+    app.post("/files/delete-batch", authMiddleware,requireRole([Role.SUPER_ADMIN]), deleteFiles);
+    app.get("/files/:filename/download", authMiddleware,requireRole([Role.SUPER_ADMIN]), downloadFile);
+    app.get("/vectorstore/status", authMiddleware,requireRole([Role.SUPER_ADMIN]),getVectorstoreStatus);
+}
