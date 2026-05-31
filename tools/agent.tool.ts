@@ -82,6 +82,85 @@ export const agentResponse = async (req: AuthRequest, res: Response) => {
         });
     }
 };
+
+
+
+
+export const agentClientResponse = async (req: AuthRequest, res: Response) => {
+    try {
+        console.log("Token:", req.headers.authorization);
+        dotenv.config();
+        console.log(req.body)
+        const {question,modeResponse,sessionId} = req.body;
+
+
+
+        const response = await axios.post(
+
+            process.env.AGENT_SERVICE_URL + "/agent",
+            {
+                question: question,
+                mode_response:modeResponse,
+                sessionId:sessionId
+            },
+            {
+                headers: {
+                    Authorization: req.headers.authorization
+                }
+            }
+        );
+
+        return res.status(200).json(response.data);
+
+
+    } catch (error: any) {
+        console.error(error?.response?.data || error.message);
+
+        return res.status(500).json({
+            message: "Error calling agent service: " + (error?.response?.data.detail || error.message.detail)
+        });
+    }
+};
+
+
+
+
+export const agentAnonymousResponse = async (req: AuthRequest, res: Response) => {
+    try {
+        dotenv.config();
+        console.log(req.body)
+        const {question,modeResponse,sessionId} = req.body;
+
+
+
+        const response = await axios.post(
+
+            process.env.AGENT_SERVICE_URL + "/agent-anonymous",
+            {
+                question: question,
+                mode_response:modeResponse,
+                sessionId:sessionId
+            },
+        );
+
+        return res.status(200).json(response.data);
+
+
+    } catch (error: any) {
+        console.error(error?.response?.data || error.message);
+
+        return res.status(500).json({
+            message: "Error calling agent service: " + (error?.response?.data.detail || error.message.detail)
+        });
+    }
+};
+
+
+
+
+
+
+
 export const uploadFiles = async (req: AuthRequest, res: Response) => {
     try {
         const files = req.files as Express.Multer.File[];

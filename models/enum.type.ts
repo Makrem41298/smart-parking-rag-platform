@@ -36,7 +36,7 @@ export enum PaymentStatus {
     PENDING= "PENDING",
 }
 
-export enum ReclamationStatus {
+export enum   ReclamationStatus {
     IN_PROGRESS = "IN_PROGRESS",
     RESOLVED = "RESOLVED",
     REJECTED = "REJECTED"

@@ -11,7 +11,13 @@ app.use(
     "/uploads",
     express.static(path.join(process.cwd(), "uploads"))
 );
-app.use(express.json());
+app.use((req, res, next) => {
+    if (req.originalUrl === "/api/stripe/webhook") {
+        next();
+    } else {
+        express.json()(req, res, next);
+    }
+});
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
     origin: process.env.FRONT_URL, // your React app

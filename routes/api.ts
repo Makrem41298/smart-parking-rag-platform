@@ -1,6 +1,9 @@
 import {Application} from "express";
 import {changePassword, getProfile, login, logout, refreshToken, register} from "../controllers/auth.controller";
 import {authMiddleware} from "../middlewares/auth.middleware";
+
+import express from "express";
+
 import {
     createTarifGrid,
     deleteTarifGrid,
@@ -41,6 +44,8 @@ import {
     updateReclamation
 } from "../controllers/reclamation.controller";
 import {
+    agentAnonymousResponse,
+    agentClientResponse,
     agentResponse,
     deleteFiles,
     downloadFile,
@@ -53,6 +58,7 @@ import { QueryTypes } from "sequelize";
 
 import {  Request, Response } from "express";
 import multer from "multer";
+import {initCheckout, webhook} from "../controllers/payment.controller";
 export default function routes(app: Application): void {
 
 
@@ -124,9 +130,17 @@ export default function routes(app: Application): void {
     });
     app.post("/upload",authMiddleware,requireRole([Role.SUPER_ADMIN]), upload.array("files"),uploadFiles)
     app.post("/agent",authMiddleware,requireRole([Role.SUPER_ADMIN,Role.ADMIN]),agentResponse)
+    app.post("/agent-client",authMiddleware,requireRole([Role.CLIENT]),agentClientResponse)
+    app.post("/agent-anonymous",agentAnonymousResponse)
+
     app.get("/files",authMiddleware,requireRole([Role.SUPER_ADMIN]),getFiles)
 
     app.post("/files/delete-batch", authMiddleware,requireRole([Role.SUPER_ADMIN]), deleteFiles);
     app.get("/files/:filename/download", authMiddleware,requireRole([Role.SUPER_ADMIN]), downloadFile);
     app.get("/vectorstore/status", authMiddleware,requireRole([Role.SUPER_ADMIN]),getVectorstoreStatus);
+
+
+    app.post("/create-checkout-session",initCheckout)
+    app.post("/api/stripe/webhook",  express.raw({ type: "application/json" }),webhook);
+
 }
