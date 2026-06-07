@@ -74,7 +74,7 @@ export class Reclamation extends Model<ReclamationAttributes,ReclamationCreation
         status: {
           type:DataTypes.ENUM(...Object.values(ReclamationStatus)),
             allowNull: false,
-            defaultValue: ReclamationStatus.IN_PROGRESS,
+            defaultValue: ReclamationStatus.OPEN,
         },
       conversationHistory: {
         type:DataTypes.JSON,

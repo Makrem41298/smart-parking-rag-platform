@@ -1,4 +1,5 @@
 import { QueryInterface, DataTypes } from "sequelize";
+import { PaymentStatus } from "../../models/enum.type";
 
 module.exports = {
   async up(queryInterface: QueryInterface) {
@@ -26,9 +27,9 @@ module.exports = {
       },
 
       status: {
-        type: DataTypes.ENUM("PENDING", "SUCCESS", "FAILED"),
+        type: DataTypes.ENUM(...Object.values(PaymentStatus)),
         allowNull: false,
-        defaultValue: "PENDING",
+        defaultValue: PaymentStatus.PENDING,
       },
 
       paymentableId: {

@@ -77,7 +77,7 @@ export const initReservation = (sequelize: Sequelize): void => {
             status: {
                 type: DataTypes.ENUM(...Object.values(ReservationStatus)),
                 allowNull: false,
-                defaultValue: ReservationStatus.REQUESTED,
+                defaultValue: ReservationStatus.PENDING,
             },
             entryTime: {
                 type: DataTypes.DATE,

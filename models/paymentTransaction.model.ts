@@ -10,14 +10,17 @@ export interface PaymentTransactionAttributes {
     paymentDateTime: Date;
     method: string;
     status: PaymentStatus;
+    stripeSessionId: string | null;
     paymentableId: number;
-    paymentableType:string;
+    paymentableType: string; // "reservation" | "subscription"
 }
 
 export interface CreatePaymentTransactionAttributes
-    extends Optional<PaymentTransactionAttributes, "id" | "status"> {}
+    extends Optional<PaymentTransactionAttributes, "id" | "status" | "stripeSessionId"> {}
 
-const uppercaseFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);export class PaymentTransactionModel
+const uppercaseFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+export class PaymentTransactionModel
     extends Model<PaymentTransactionAttributes, CreatePaymentTransactionAttributes>
     implements PaymentTransactionAttributes
 {
@@ -26,6 +29,7 @@ const uppercaseFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(
     declare paymentDateTime: Date;
     declare method: string;
     declare status: PaymentStatus;
+    declare stripeSessionId: string | null;
     declare paymentableId: number;
     declare paymentableType: string;
 
@@ -64,11 +68,15 @@ export const initPaymentTransaction = (sequelize: Sequelize): void => {
                 allowNull: false,
                 defaultValue: PaymentStatus.PENDING,
             },
+            stripeSessionId: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                unique: true,
+            },
             paymentableId: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
-
             paymentableType: {
                 type: DataTypes.STRING,
                 allowNull: false,
@@ -79,6 +87,14 @@ export const initPaymentTransaction = (sequelize: Sequelize): void => {
             modelName: "PaymentTransactionModel",
             tableName: "payment_transactions",
             timestamps: true,
+            indexes: [
+                {
+                    // 🔥 Enforces polymorphic 1:1: one payment per (type + id) pair
+                    unique: true,
+                    fields: ["paymentableId", "paymentableType"],
+                    name: "unique_paymentable",
+                },
+            ],
         }
     );
 };

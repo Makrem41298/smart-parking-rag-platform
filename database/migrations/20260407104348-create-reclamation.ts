@@ -41,7 +41,7 @@ export const up: Migration["up"] = async (queryInterface: QueryInterface) => {
     status: {
       type: DataTypes.ENUM(...Object.values(ReclamationStatus)),
       allowNull: false,
-      defaultValue: ReclamationStatus.IN_PROGRESS,
+      defaultValue: ReclamationStatus.OPEN,
     },
     conversationHistory: {
       type:DataTypes.JSON,

@@ -1,4 +1,5 @@
 import { QueryInterface, DataTypes } from "sequelize";
+import { ParkingStatus } from "../../models/enum.type";
 
 module.exports = {
   async up(queryInterface: QueryInterface) {
@@ -53,9 +54,9 @@ module.exports = {
       },
 
       statusParking: {
-        type: DataTypes.ENUM("OPEN", "CLOSED", "MAINTENANCE"),
+        type: DataTypes.ENUM(...Object.values(ParkingStatus)),
         allowNull: false,
-        defaultValue: "OPEN",
+        defaultValue: ParkingStatus.OPEN,
       },
 
       reservationAvailability: {

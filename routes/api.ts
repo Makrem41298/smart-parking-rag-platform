@@ -58,7 +58,7 @@ import { QueryTypes } from "sequelize";
 
 import {  Request, Response } from "express";
 import multer from "multer";
-import {initCheckout, webhook} from "../controllers/payment.controller";
+import {initCheckout, webhook, getPaymentByReservation, getAllTransactions, getTransactionById, requestRefund, approveRefund, rejectRefund} from "../controllers/payment.controller";
 export default function routes(app: Application): void {
 
 
@@ -140,7 +140,13 @@ export default function routes(app: Application): void {
     app.get("/vectorstore/status", authMiddleware,requireRole([Role.SUPER_ADMIN]),getVectorstoreStatus);
 
 
-    app.post("/create-checkout-session",initCheckout)
-    app.post("/api/stripe/webhook",  express.raw({ type: "application/json" }),webhook);
+    app.post("/create-checkout-session", authMiddleware, initCheckout)
+    app.post("/api/stripe/webhook",  express.raw({ type: "application/json" }), webhook);
+    app.get("/payments/reservation/:reservationId", authMiddleware, getPaymentByReservation);
+    app.get("/transactions", authMiddleware, getAllTransactions);
+    app.get("/transactions/:id", authMiddleware, getTransactionById);
+    app.post("/transactions/:id/refund-request", authMiddleware, requestRefund);
+    app.post("/transactions/:id/refund-approve", authMiddleware, requireRole([Role.ADMIN, Role.SUPER_ADMIN]), approveRefund);
+    app.post("/transactions/:id/refund-reject", authMiddleware, requireRole([Role.ADMIN, Role.SUPER_ADMIN]), rejectRefund);
 
 }

@@ -1,4 +1,5 @@
 import { QueryInterface, DataTypes } from "sequelize";
+import { ReservationStatus } from "../../models/enum.type";
 
 module.exports = {
   async up(queryInterface: QueryInterface) {
@@ -48,9 +49,9 @@ module.exports = {
       },
 
       status: {
-        type: DataTypes.ENUM("REQUESTED", "CONFIRMED", "CANCELLED","EXPIRED","USED"),
+        type: DataTypes.ENUM(...Object.values(ReservationStatus)),
         allowNull: false,
-        defaultValue: "REQUESTED",
+        defaultValue: ReservationStatus.PENDING,
       },
       entryTime:{
         type: DataTypes.DATE,

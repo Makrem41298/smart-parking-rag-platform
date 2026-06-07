@@ -25,7 +25,7 @@ export const createReclamation = async (req: AuthRequest, res: Response) => {
             clientId: userId,
             subject: subject?.trim() || null,
             content: content.trim(),
-            status: ReclamationStatus.IN_PROGRESS,
+            status: ReclamationStatus.OPEN,
 
         });
 
@@ -72,52 +72,53 @@ export const updateReclamation = async (req: AuthRequest, res: Response) => {
             });
         }
 
-        // ================= ADMIN =================
-        if (user.role === Role.ADMIN) {
+        // ================= ADMIN / SUPER_ADMIN =================
+        if (user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN) {
+            let targetStatus = status;
 
+            if (targetStatus === ReclamationStatus.REJECTED) {
+                targetStatus = ReclamationStatus.REJECTED;
+            } else if (solution && solution.trim() !== "") {
+                targetStatus = ReclamationStatus.RESOLVED;
+            } else if (!targetStatus) {
+                targetStatus = ReclamationStatus.IN_PROGRESS;
+            }
 
-
-            if (status) {
-                if (!Object.values(ReclamationStatus).includes(status)) {
-                    return res.status(400).json({
-                        message: "Invalid status value",
-                        allowedValues: Object.values(ReclamationStatus),
-                    });
-                }
-            }else{
+            if (!Object.values(ReclamationStatus).includes(targetStatus)) {
                 return res.status(400).json({
                     message: "Invalid status value",
                     allowedValues: Object.values(ReclamationStatus),
-                })
+                });
             }
 
             await reclamation.update({
-                solution: solution.trim(),
+                solution: solution ? solution.trim() : reclamation.solution,
                 adminId: user.id,
-                status: status,
+                status: targetStatus,
             });
 
-            return res.status(200).json(
-              reclamation
-            );
+            return res.status(200).json(reclamation);
         }
 
         // ================= CLIENT =================
-        // 🔹 Check ownership
-
-
-
-
-
         if (reclamation.clientId != user.id) {
-            console.log("id clinet ",reclamation.clientId )
-            console.log("id clinet ",user.id)
             return res.status(403).json({
                 message: "Forbidden: You can't update this reclamation",
             });
         }
 
-        // 🔹 Validate content
+        // If client is accepting or refusing the resolution
+        if (status === ReclamationStatus.CLOSED || status === ReclamationStatus.IN_PROGRESS) {
+            if (reclamation.status !== ReclamationStatus.RESOLVED) {
+                return res.status(400).json({
+                    message: "You can only accept or refuse a resolution when status is RESOLVED.",
+                });
+            }
+            await reclamation.update({ status });
+            return res.status(200).json(reclamation);
+        }
+
+        // Otherwise, allow client to edit content
         if (!content || typeof content !== "string" || !content.trim()) {
             return res.status(400).json({
                 message: "Content is required",
@@ -128,9 +129,7 @@ export const updateReclamation = async (req: AuthRequest, res: Response) => {
             content: content.trim(),
         });
 
-        return res.status(200).json(
-           reclamation
-        );
+        return res.status(200).json(reclamation);
 
     } catch (error) {
         console.error("Update Reclamation Error:", error);
@@ -215,6 +214,13 @@ export const getReclamationById = async (req: AuthRequest, res: Response) => {
               message: "Reclamation not found"
           })
       }
+
+      // Automatically change status from OPEN to IN_PROGRESS when viewed by an admin
+      const isAdmin = user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN;
+      if (isAdmin && reclamation.status === ReclamationStatus.OPEN) {
+          await reclamation.update({ status: ReclamationStatus.IN_PROGRESS });
+      }
+
       return res.status(201).json(
           reclamation
       )

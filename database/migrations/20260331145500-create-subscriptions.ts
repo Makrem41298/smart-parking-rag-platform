@@ -1,9 +1,9 @@
 import { QueryInterface, DataTypes } from "sequelize";
-import { PlanStatus } from "../../models/enum.type";
+import { SubscriptionStatus } from "../../models/enum.type";
 
 module.exports = {
   async up(queryInterface: QueryInterface) {
-    await queryInterface.createTable("plan_parking_lots", {
+    await queryInterface.createTable("subscriptions", {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -11,41 +11,41 @@ module.exports = {
         allowNull: false,
       },
 
-      planId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: "plans",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-      },
-
-      parkingLotId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-          model: "parking_lots",
-          key: "id",
-        },
-        onUpdate: "CASCADE",
-        onDelete: "CASCADE",
-      },
-
       status: {
-        type: DataTypes.ENUM(...Object.values(PlanStatus)),
+        type: DataTypes.ENUM(...Object.values(SubscriptionStatus)),
         allowNull: false,
-        defaultValue: PlanStatus.ACTIVE,
+        defaultValue: SubscriptionStatus.ACTIVE,
       },
 
-      renewFee: {
-        type: DataTypes.DECIMAL(10, 2),
+      planParkingLotId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "plan_parking_lots",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
+
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
+
+      startDate: {
+        type: DataTypes.DATE,
         allowNull: false,
       },
 
-      subscriptionFee: {
-        type: DataTypes.DECIMAL(10, 2),
+      endDate: {
+        type: DataTypes.DATE,
         allowNull: false,
       },
 
@@ -60,15 +60,10 @@ module.exports = {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
-
     });
-
-
   },
 
   async down(queryInterface: QueryInterface) {
-    await queryInterface.dropTable("plan_parking_lots");
-
-
+    await queryInterface.dropTable("subscriptions");
   },
 };

@@ -1,4 +1,5 @@
 import { QueryInterface, DataTypes } from "sequelize";
+import { AccountStatus, Role } from "../../models/enum.type";
 
 module.exports = {
   async up(queryInterface: QueryInterface) {
@@ -31,12 +32,12 @@ module.exports = {
         allowNull: false,
       },
       accountStatus: {
-        type: DataTypes.ENUM("ACTIVE", "PENDING", "BLOCKED"),
-        defaultValue: "ACTIVE",
+        type: DataTypes.ENUM(...Object.values(AccountStatus)),
+        defaultValue: AccountStatus.ACTIVE,
       },
       role: {
-        type: DataTypes.ENUM("ADMIN", "CLIENT"),
-        defaultValue: "CLIENT",
+        type: DataTypes.ENUM(...Object.values(Role)),
+        defaultValue: Role.CLIENT,
       },
       CIN: {
         type: DataTypes.STRING,
