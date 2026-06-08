@@ -14,10 +14,11 @@ export interface ReservationAttributes {
     status: ReservationStatus;
     entryTime: Date | null;
     leaveTime: Date | null;
+    qrCode: string | null;
 }
 
 export interface CreateReservationAttributes
-    extends Optional<ReservationAttributes, "id" | "status"|"leaveTime"|"entryTime"> {}
+    extends Optional<ReservationAttributes, "id" | "status"|"leaveTime"|"entryTime"|"qrCode"> {}
 
 export class ReservationModel
     extends Model<ReservationAttributes, CreateReservationAttributes>
@@ -32,6 +33,7 @@ export class ReservationModel
     declare status: ReservationStatus;
     declare entryTime: Date;
     declare leaveTime: Date;
+    declare qrCode: string | null;
 }
 
 export const initReservation = (sequelize: Sequelize): void => {
@@ -88,7 +90,12 @@ export const initReservation = (sequelize: Sequelize): void => {
                 type: DataTypes.DATE,
                 allowNull: true,
                 defaultValue:null
-            }
+            },
+            qrCode: {
+                type: DataTypes.TEXT,
+                allowNull: true,
+                defaultValue: null,
+            },
 
         },
         {

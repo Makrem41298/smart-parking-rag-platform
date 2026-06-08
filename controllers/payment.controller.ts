@@ -7,6 +7,7 @@ import {UserModel} from "../models/user.model";
 import {PaymentTransactionModel} from "../models/paymentTransaction.model";
 import {EventLogModel} from "../models/eventLog.model";
 import sequelize from "../models";
+import QRCode from "qrcode";
 
 
 export async function initCheckout(req: AuthRequest, res: Response) {
@@ -218,13 +219,25 @@ export async function webhook(req: Request, res: Response) {
                 message: `Payment completed via Stripe session ${stripeSessionId}`,
             });
 
-            // Confirm the reservation
+            // Confirm the reservation and generate QR code
             if (reservationId) {
                 const reservation = await ReservationModel.findByPk(reservationId);
                 if (reservation) {
                     reservation.status = ReservationStatus.CONFIRMED;
+
+                    // ✅ Generate QR code now that payment is confirmed
+                    const qrPayload = JSON.stringify({
+                        reservationId: reservation.id,
+                        userId: reservation.userId,
+                        parkingLotId: reservation.parkingLotId,
+                        startTime: reservation.startTimeDate,
+                        endTime: reservation.endTimeDate,
+                    });
+                    const qrBase64 = await QRCode.toDataURL(qrPayload);
+                    reservation.qrCode = qrBase64;
+
                     await reservation.save();
-                    console.log("✅ Reservation confirmed:", reservationId);
+                    console.log("✅ Reservation confirmed + QR generated:", reservationId);
                 }
             }
         }
