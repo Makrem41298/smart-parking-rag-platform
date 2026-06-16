@@ -10,6 +10,9 @@ import {initPlan, PlanModel} from "./plan.model";
 import {initParkingLotModel, ParkingLots} from "./parkingLot.model";
 import {initReservation, ReservationModel} from "./reservation.model";
 import {initTarifGrid, TarifGridModel} from "./tarifGrid.model";
+import {initReclamation, Reclamation} from "./reclamation.model";
+import {initEventLog, EventLogModel} from "./eventLog.model";
+import {Role} from "./enum.type";
 
 const env = process.env.NODE_ENV || "development";
 const dbConfig = (config as any)[env];
@@ -30,7 +33,30 @@ initSubscription(sequelize);
 initPaymentTransaction(sequelize);
 initInvoice(sequelize);
 initTarifGrid(sequelize); // ✅ ADD THIS
+initReclamation(sequelize)
+initEventLog(sequelize);
 
+
+UserModel.hasMany(Reclamation, {
+    foreignKey: "clientId",
+    as: "reclamations",
+});
+
+UserModel.hasMany(Reclamation, {
+    foreignKey: "adminId",
+    as: "handledReclamations",
+});
+
+
+Reclamation.belongsTo(UserModel, {
+    foreignKey: "clientId",
+    as: "client",
+});
+
+Reclamation.belongsTo(UserModel, {
+    foreignKey: "adminId",
+    as: "admin",
+});
 
 
 TarifGridModel.hasMany(ParkingLots, {
@@ -58,8 +84,33 @@ ParkingLots.belongsTo(TarifGridModel, {
 PaymentTransactionModel.hasOne(InvoiceModel, {
     foreignKey: "paymentTransactionId",
     as: "invoice",
-});PaymentTransactionModel.belongsTo(ReservationModel, { foreignKey: 'paymentableId', constraints: false });
-PaymentTransactionModel.belongsTo(SubscriptionModel, { foreignKey: 'paymentableId', constraints: false });
+});
+
+// ─── Polymorphic 1:1: Reservation ↔ PaymentTransaction ───
+ReservationModel.hasOne(PaymentTransactionModel, {
+    foreignKey: "paymentableId",
+    constraints: false,
+    as: "paymentTransaction",
+    scope: { paymentableType: "reservation" },
+});
+PaymentTransactionModel.belongsTo(ReservationModel, {
+    foreignKey: "paymentableId",
+    constraints: false,
+    as: "reservation",
+});
+
+// ─── Polymorphic 1:1: Subscription ↔ PaymentTransaction ───
+SubscriptionModel.hasOne(PaymentTransactionModel, {
+    foreignKey: "paymentableId",
+    constraints: false,
+    as: "paymentTransaction",
+    scope: { paymentableType: "subscription" },
+});
+PaymentTransactionModel.belongsTo(SubscriptionModel, {
+    foreignKey: "paymentableId",
+    constraints: false,
+    as: "subscription",
+});
 
 ReservationModel.belongsTo(UserModel, {
     foreignKey: "userId",
@@ -84,22 +135,7 @@ ReservationModel.belongsTo(ParkingLots, {
     foreignKey: "parkingLotId",
     as: "parkingLot"
 });
-ReservationModel.hasMany(PaymentTransactionModel,{
-    foreignKey: "paymentableId",
-    constraints: false,
-    scope:{
-        paymentableType:'reservation',
 
-    }
-})
-SubscriptionModel.hasMany(PaymentTransactionModel,{
-    foreignKey: "paymentableId",
-    constraints: false,
-    scope:{
-        paymentableType:'subscription',
-
-    }
-})
 UserModel.hasMany(ReservationModel, {
     foreignKey: "userId",
     as: "reservations",
@@ -148,7 +184,16 @@ SubscriptionModel.belongsTo(PlanParkingLotModel, {
     as: 'PlanParkingLots'
 });
 
+// PaymentTransaction ↔ EventLog (1:many)
+PaymentTransactionModel.hasMany(EventLogModel, {
+    foreignKey: "paymentTransactionId",
+    as: "eventLogs",
+});
 
+EventLogModel.belongsTo(PaymentTransactionModel, {
+    foreignKey: "paymentTransactionId",
+    as: "paymentTransaction",
+});
 
 
 export default sequelize;

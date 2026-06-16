@@ -2,13 +2,27 @@ import dotenv from "dotenv";
 import express, { Application } from "express";
 import routes from "./routes/api";
 import sequelize  from "./models/index";
+import cors from "cors";
+import path from "node:path";
 
 dotenv.config();
 const app: Application = express();
-
-app.use(express.json());
+app.use(
+    "/uploads",
+    express.static(path.join(process.cwd(), "uploads"))
+);
+app.use((req, res, next) => {
+    if (req.originalUrl === "/api/stripe/webhook") {
+        next();
+    } else {
+        express.json()(req, res, next);
+    }
+});
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cors({
+    origin: process.env.FRONT_URL, // your React app
+    credentials: true
+}));
 const port: number = Number(process.env.PORT) || 3000;
 
 console.log("DATABASE_URL =", process.env.DB_HOST);
