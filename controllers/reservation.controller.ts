@@ -253,22 +253,38 @@ export const updateReservation = async (req: AuthRequest, res: Response) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
-const calculatePrice = (diffInMinutes: number, tarifGrid: { price: number; minutes: number }[]): number =>
+const calculatePrice = (diffInMinutes: number, tarifGrid: { price: number; minutes: number }[]): number => {
+    if (!gridLength(tarifGrid)) return 0;
 
-{
-
-    const sortedGrid = tarifGrid.sort(
+    const sortedGrid = [...tarifGrid].sort(
         (a, b) => a.minutes - b.minutes
     );
 
-    const tarif = sortedGrid.find(
-        t => diffInMinutes <= t.minutes
-    );
+    const maxTier = sortedGrid[sortedGrid.length - 1];
 
-    return tarif
-        ? tarif.price
-        : sortedGrid[sortedGrid.length - 1].price;
+    let totalPrice = 0;
+    const hourUnit = 60; // Use 60 minutes (1 hour) as the unit for recurring calculation
+
+    if (diffInMinutes < hourUnit) {
+        const fittingTier = sortedGrid.find(t => diffInMinutes <= t.minutes);
+        totalPrice = fittingTier ? fittingTier.price : maxTier.price;
+    } else {
+        const hours = Math.floor(diffInMinutes / hourUnit);
+        totalPrice = hours * maxTier.price;
+        const remainder = diffInMinutes % hourUnit;
+
+        if (remainder > 0) {
+            const fittingTier = sortedGrid.find(t => remainder <= t.minutes);
+            totalPrice += fittingTier ? fittingTier.price : maxTier.price;
+        }
+    }
+
+    return totalPrice;
 };
+
+function gridLength(grid: any): boolean {
+    return grid && grid.length > 0;
+}
 
 
 
