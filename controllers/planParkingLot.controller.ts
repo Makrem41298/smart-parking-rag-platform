@@ -4,31 +4,26 @@ import { PlanModel } from "../models/plan.model";
 import { ParkingLots } from "../models/parkingLot.model";
 import { PlanStatus } from "../models/enum.type";
 
-// Create a plan-parking-lot link
 export const createPlanParkingLot = async (req: Request, res: Response) => {
     try {
         const { planId, parkingLotId, renewFee, subscriptionFee, status } = req.body;
 
-        // Required fields
         if (!planId || !parkingLotId || !renewFee || !subscriptionFee) {
             return res.status(400).json({
                 message: "Missing required fields: planId, parkingLotId, renewFee, subscriptionFee"
             });
         }
 
-        // Validate FK: plan
         const plan = await PlanModel.findByPk(planId);
         if (!plan) {
             return res.status(400).json({ message: "Invalid planId" });
         }
 
-        // Validate FK: parking lot
         const parking = await ParkingLots.findByPk(parkingLotId);
         if (!parking) {
             return res.status(400).json({ message: "Invalid parkingLotId" });
         }
 
-        // Validate ENUM
         if (status && !Object.values(PlanStatus).includes(status)) {
             return res.status(400).json({
                 message: `Invalid status. Allowed: ${Object.values(PlanStatus).join(", ")}`
@@ -50,7 +45,6 @@ export const createPlanParkingLot = async (req: Request, res: Response) => {
     }
 };
 
-// Get all plan-parking-lot links
 export const getAllPlanParkingLots = async (_req: Request, res: Response) => {
     try {
         const links = await PlanParkingLotModel.findAll({
@@ -67,7 +61,6 @@ export const getAllPlanParkingLots = async (_req: Request, res: Response) => {
     }
 };
 
-// Get one link by ID
 export const getPlanParkingLotById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -91,7 +84,6 @@ export const getPlanParkingLotById = async (req: Request, res: Response) => {
     }
 };
 
-// Update a link
 export const updatePlanParkingLot = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -104,14 +96,12 @@ export const updatePlanParkingLot = async (req: Request, res: Response) => {
 
         const { planId, parkingLotId, renewFee, subscriptionFee, status } = req.body;
 
-        // Validate ENUM
         if (status && !Object.values(PlanStatus).includes(status)) {
             return res.status(400).json({
                 message: `Invalid status. Allowed: ${Object.values(PlanStatus).join(", ")}`
             });
         }
 
-        // Validate FK: plan
         if (planId) {
             const plan = await PlanModel.findByPk(planId);
             if (!plan) {
@@ -119,7 +109,6 @@ export const updatePlanParkingLot = async (req: Request, res: Response) => {
             }
         }
 
-        // Validate FK: parking lot
         if (parkingLotId) {
             const parking = await ParkingLots.findByPk(parkingLotId);
             if (!parking) {
@@ -142,7 +131,6 @@ export const updatePlanParkingLot = async (req: Request, res: Response) => {
     }
 };
 
-// Delete a link
 export const deletePlanParkingLot = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;

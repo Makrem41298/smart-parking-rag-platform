@@ -52,7 +52,7 @@ import {
     getFiles,
     getVectorstoreStatus,
     uploadFiles
-} from "../tools/agent.tool";
+} from "../controllers/agent.controller";
 import sequelize from "../models";
 import { QueryTypes } from "sequelize";
 

@@ -48,14 +48,12 @@ export const updateReclamation = async (req: AuthRequest, res: Response) => {
         const { id: reclamationId } = req.params;
         const user = req.user;
 
-        // 🔹 Check auth
         if (!user) {
             return res.status(401).json({
                 message: "Unauthorized",
             });
         }
 
-        // 🔹 Validate ID
         const id = Number(reclamationId);
         if (!reclamationId || isNaN(id)) {
             return res.status(400).json({
@@ -63,7 +61,6 @@ export const updateReclamation = async (req: AuthRequest, res: Response) => {
             });
         }
 
-        // 🔹 Find reclamation once
         const reclamation = await Reclamation.findByPk(id);
 
         if (!reclamation) {
@@ -72,7 +69,6 @@ export const updateReclamation = async (req: AuthRequest, res: Response) => {
             });
         }
 
-        // ================= ADMIN / SUPER_ADMIN =================
         if (user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN) {
             let targetStatus = status;
 
@@ -100,14 +96,12 @@ export const updateReclamation = async (req: AuthRequest, res: Response) => {
             return res.status(200).json(reclamation);
         }
 
-        // ================= CLIENT =================
         if (reclamation.clientId != user.id) {
             return res.status(403).json({
                 message: "Forbidden: You can't update this reclamation",
             });
         }
 
-        // If client is accepting or refusing the resolution
         if (status === ReclamationStatus.CLOSED || status === ReclamationStatus.IN_PROGRESS) {
             if (reclamation.status !== ReclamationStatus.RESOLVED) {
                 return res.status(400).json({
@@ -118,7 +112,6 @@ export const updateReclamation = async (req: AuthRequest, res: Response) => {
             return res.status(200).json(reclamation);
         }
 
-        // Otherwise, allow client to edit content
         if (!content || typeof content !== "string" || !content.trim()) {
             return res.status(400).json({
                 message: "Content is required",
@@ -163,8 +156,10 @@ export const getAllReclamations = async (req: AuthRequest, res: Response) => {
                     attributes: ["id", "firstName", "lastName", "email", "role"],
                 },
             ],
+            order: [
+                ["createdAt", "DESC"]
+            ]
         });
-
 
 
         return res.status(200).json(
@@ -215,7 +210,6 @@ export const getReclamationById = async (req: AuthRequest, res: Response) => {
           })
       }
 
-      // Automatically change status from OPEN to IN_PROGRESS when viewed by an admin
       const isAdmin = user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN;
       if (isAdmin && reclamation.status === ReclamationStatus.OPEN) {
           await reclamation.update({ status: ReclamationStatus.IN_PROGRESS });

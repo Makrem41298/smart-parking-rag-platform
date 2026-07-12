@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { TarifGridModel } from "../models/tarifGrid.model";
 
-// Create a new tariff grid
 export const createTarifGrid = async (req: Request, res: Response) => {
     try {
         const { name, grid } = req.body;
@@ -19,7 +18,6 @@ export const createTarifGrid = async (req: Request, res: Response) => {
     }
 };
 
-// Get all tariff grids
 export const getAllTarifGrids = async (_req: Request, res: Response) => {
     try {
         const grids = await TarifGridModel.findAll();
@@ -49,7 +47,6 @@ export const getTarifGridById = async (req: Request, res: Response) => {
     }
 };
 
-// Update a tariff grid
 export const updateTarifGrid = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -71,7 +68,6 @@ export const updateTarifGrid = async (req: Request, res: Response) => {
     }
 };
 
-// Delete a tariff grid
 export const deleteTarifGrid = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;

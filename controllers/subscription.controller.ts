@@ -7,7 +7,6 @@ import {AuthRequest} from "../middlewares/auth.middleware";
 import {PlanModel} from "../models/plan.model";
 
 
-// Create subscription
 export const createSubscription = async (req: AuthRequest, res: Response) => {
     try {
         const { planParkingLotId } = req.body;
@@ -56,7 +55,6 @@ export const createSubscription = async (req: AuthRequest, res: Response) => {
 };
 
 
-// Get all subscriptions
 export const getAllSubscriptions = async (_req: AuthRequest, res: Response) => {
     try {
 
@@ -85,7 +83,6 @@ export const getAllSubscriptions = async (_req: AuthRequest, res: Response) => {
     }
 };
 
-// Get subscription by ID
 export const getSubscriptionById = async (req: AuthRequest, res: Response) => {
     try {
 

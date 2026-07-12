@@ -21,7 +21,6 @@ export async function initCheckout(req: AuthRequest, res: Response) {
             return res.status(400).json({ message: "reservationId and amount are required" });
         }
 
-        // ✅ Validate reservation exists and is in PENDING status
         const reservation = await ReservationModel.findByPk(reservationId, { transaction });
 
         if (!reservation) {
@@ -36,7 +35,6 @@ export async function initCheckout(req: AuthRequest, res: Response) {
             });
         }
 
-        // ✅ Prevent duplicate payments (polymorphic 1:1 check)
         const existingPayment = await PaymentTransactionModel.findOne({
             where: { paymentableId: reservationId, paymentableType: "reservation" },
             transaction,
@@ -51,7 +49,6 @@ export async function initCheckout(req: AuthRequest, res: Response) {
                 });
             }
 
-            // If it is PENDING, try to retrieve the existing Stripe session
             if (existingPayment.status === PaymentStatus.PENDING && existingPayment.stripeSessionId) {
                 try {
                     const session = await stripe.checkout.sessions.retrieve(existingPayment.stripeSessionId);
@@ -68,7 +65,6 @@ export async function initCheckout(req: AuthRequest, res: Response) {
                 }
             }
 
-            // Create new checkout session and update the existing PaymentTransaction record
             const session = await stripe.checkout.sessions.create({
                 mode: "payment",
                 payment_method_types: ["card"],
@@ -118,7 +114,6 @@ export async function initCheckout(req: AuthRequest, res: Response) {
             });
         }
 
-        // ✅ Create Stripe checkout session
         const session = await stripe.checkout.sessions.create({
             mode: "payment",
             payment_method_types: ["card"],
@@ -141,7 +136,6 @@ export async function initCheckout(req: AuthRequest, res: Response) {
             cancel_url: `${process.env.FRONTEND_URL}/payment-cancel`,
         });
 
-        // ✅ Create PaymentTransaction with PENDING status (polymorphic)
         const paymentTransaction = await PaymentTransactionModel.create(
             {
                 amount,
@@ -155,7 +149,6 @@ export async function initCheckout(req: AuthRequest, res: Response) {
             { transaction }
         );
 
-        // ✅ Log the PENDING event
         await EventLogModel.create(
             {
                 paymentTransactionId: paymentTransaction.id,
@@ -199,7 +192,6 @@ export async function webhook(req: Request, res: Response) {
             const stripeSessionId = session.id;
             const reservationId = session.metadata?.reservationId;
 
-            // Find PaymentTransaction by stripeSessionId
             const paymentTransaction = await PaymentTransactionModel.findOne({
                 where: { stripeSessionId },
             });
@@ -209,23 +201,19 @@ export async function webhook(req: Request, res: Response) {
                 return res.status(200).json({ received: true, warning: "PaymentTransaction not found" });
             }
 
-            // Update payment status to SUCCESS
             await paymentTransaction.update({ status: PaymentStatus.SUCCESS });
 
-            // Log SUCCESS event
             await EventLogModel.create({
                 paymentTransactionId: paymentTransaction.id,
                 status: PaymentStatus.SUCCESS,
                 message: `Payment completed via Stripe session ${stripeSessionId}`,
             });
 
-            // Confirm the reservation and generate QR code
             if (reservationId) {
                 const reservation = await ReservationModel.findByPk(reservationId);
                 if (reservation) {
                     reservation.status = ReservationStatus.CONFIRMED;
 
-                    // ✅ Generate QR code now that payment is confirmed
                     const qrPayload = JSON.stringify({
                         reservationId: reservation.id,
                         userId: reservation.userId,
@@ -242,7 +230,6 @@ export async function webhook(req: Request, res: Response) {
             }
         }
 
-        // ─────────── checkout.session.expired ───────────
         if (event.type === "checkout.session.expired") {
             const session = event.data.object as any;
             const stripeSessionId = session.id;
@@ -264,17 +251,16 @@ export async function webhook(req: Request, res: Response) {
             }
         }
 
-        // ─────────── payment_intent.payment_failed ───────────
         if (event.type === "payment_intent.payment_failed") {
             const paymentIntent = event.data.object as any;
             const failureMessage = paymentIntent.last_payment_error?.message || "Unknown error";
 
-            console.error(`❌ Payment intent failed: ${paymentIntent.id} - ${failureMessage}`);
+            console.error(` Payment intent failed: ${paymentIntent.id} - ${failureMessage}`);
         }
 
         return res.status(200).json({ received: true });
     } catch (err: any) {
-        console.error("❌ Webhook signature verification error:", err.message);
+        console.error(" Webhook signature verification error:", err.message);
         return res.status(400).send(`Webhook error: ${err.message}`);
     }
 }
@@ -284,15 +270,20 @@ export async function getPaymentByReservation(req: AuthRequest, res: Response) {
     try {
         const { reservationId } = req.params;
 
-        // Polymorphic lookup
         const payment = await PaymentTransactionModel.findOne({
             where: {
                 paymentableId: reservationId,
                 paymentableType: "reservation",
             },
             include: [
-                { model: EventLogModel, as: "eventLogs" },
+                {
+                    model: EventLogModel,
+                    as: "eventLogs",
+                },
             ],
+            order: [
+                ['createdAt', 'DESC']
+            ]
         });
 
         if (!payment) {
@@ -314,13 +305,11 @@ export async function getAllTransactions(req: AuthRequest, res: Response) {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        // Admin/SuperAdmin → all transactions | Client → only their own
         const isAdmin = user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN;
 
         const whereCondition: any = { paymentableType: "reservation" };
 
         if (!isAdmin) {
-            // Find all reservation IDs belonging to this client
             const userReservations = await ReservationModel.findAll({
                 where: { userId: user.id },
                 attributes: ["id"],
@@ -387,7 +376,6 @@ export async function getTransactionById(req: AuthRequest, res: Response) {
             return res.status(404).json({ message: "Transaction not found" });
         }
 
-        // Client can only see their own transactions
         const isAdmin = user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN;
         if (!isAdmin) {
             const reservation = await ReservationModel.findByPk(transaction.paymentableId);
@@ -420,7 +408,6 @@ export async function requestRefund(req: AuthRequest, res: Response) {
             return res.status(404).json({ message: "Transaction not found" });
         }
 
-        // Validate ownership if not admin/super_admin
         const isAdmin = user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN;
         if (!isAdmin) {
             const reservation = await ReservationModel.findByPk(payment.paymentableId, { transaction });
@@ -430,7 +417,6 @@ export async function requestRefund(req: AuthRequest, res: Response) {
             }
         }
 
-        // Must be SUCCESS to request refund
         if (payment.status !== PaymentStatus.SUCCESS) {
             await transaction.rollback();
             return res.status(400).json({
@@ -438,7 +424,6 @@ export async function requestRefund(req: AuthRequest, res: Response) {
             });
         }
 
-        // Enforce only one refund request per transaction
         const alreadyRequested = await EventLogModel.findOne({
             where: {
                 paymentTransactionId: payment.id,
@@ -485,7 +470,6 @@ export async function approveRefund(req: AuthRequest, res: Response) {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        // Only Admin or Super Admin
         const isAdmin = user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN;
         if (!isAdmin) {
             await transaction.rollback();
@@ -507,7 +491,6 @@ export async function approveRefund(req: AuthRequest, res: Response) {
 
         await payment.update({ status: PaymentStatus.REFUNDED }, { transaction });
 
-        // Cancel the reservation if paymentableType is reservation
         if (payment.paymentableType === "reservation") {
             const reservation = await ReservationModel.findByPk(payment.paymentableId, { transaction });
             if (reservation) {
@@ -544,7 +527,6 @@ export async function rejectRefund(req: AuthRequest, res: Response) {
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        // Only Admin or Super Admin
         const isAdmin = user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN;
         if (!isAdmin) {
             await transaction.rollback();

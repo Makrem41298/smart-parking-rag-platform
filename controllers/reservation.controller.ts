@@ -7,7 +7,6 @@ import {AuthRequest} from "../middlewares/auth.middleware";
 import {TarifGridModel} from "../models/tarifGrid.model";
 import sequelize from "../models";
 
-// Create reservation
 
 export const createReservation = async (req: AuthRequest, res: Response) => {
     const transaction = await sequelize.transaction();
@@ -124,7 +123,6 @@ export const createReservation = async (req: AuthRequest, res: Response) => {
         });
     }
 };
-// Get all reservations
 export const getAllReservations = async (_req: AuthRequest, res: Response) => {
     try {
         if (!_req.user) {
@@ -136,12 +134,20 @@ export const getAllReservations = async (_req: AuthRequest, res: Response) => {
         const reservations = await ReservationModel.findAll({
             where: whereCondition,
             include: [
-                { model: ParkingLots, as: "parkingLot" },
+                {
+                    model: ParkingLots,
+                    as: "parkingLot"
+                },
                 {
                     model: UserModel,
                     as: "user",
-                    attributes: { exclude: ["password"] }
+                    attributes: {
+                        exclude: ["password"]
+                    }
                 }
+            ],
+            order: [
+                ['createdAt', 'DESC']
             ]
         });
 
@@ -153,7 +159,6 @@ export const getAllReservations = async (_req: AuthRequest, res: Response) => {
     }
 };
 
-// Get reservation by ID
 export const getReservationById = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
@@ -180,7 +185,6 @@ export const getReservationById = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// Update reservation
 export const updateReservation = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
@@ -212,14 +216,12 @@ export const updateReservation = async (req: AuthRequest, res: Response) => {
             leaveTime
         } = req.body;
 
-        // Validate ENUM
         if (status && !Object.values(ReservationStatus).includes(status)) {
             return res.status(400).json({
                 message: `Invalid status. Allowed: ${Object.values(ReservationStatus).join(", ")}`
             });
         }
 
-        // Validate FK: parking lot
         if (parkingLotId) {
             const parking = await ParkingLots.findByPk(parkingLotId);
             if (!parking) {
@@ -227,7 +229,6 @@ export const updateReservation = async (req: AuthRequest, res: Response) => {
             }
         }
 
-        // Validate FK: user
 
         if (userId) {
             const user = await UserModel.findByPk(userId);
@@ -263,7 +264,7 @@ const calculatePrice = (diffInMinutes: number, tarifGrid: { price: number; minut
     const maxTier = sortedGrid[sortedGrid.length - 1];
 
     let totalPrice = 0;
-    const hourUnit = 60; // Use 60 minutes (1 hour) as the unit for recurring calculation
+    const hourUnit = 60;
 
     if (diffInMinutes < hourUnit) {
         const fittingTier = sortedGrid.find(t => diffInMinutes <= t.minutes);

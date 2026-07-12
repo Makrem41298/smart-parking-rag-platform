@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { PlanModel } from "../models/plan.model";
 
-// Create a plan
 export const createPlan = async (req: Request, res: Response) => {
     try {
         const { name, activeDays, startDate, endDate,NumberOfBenefitDays } = req.body;
@@ -27,7 +26,6 @@ export const createPlan = async (req: Request, res: Response) => {
     }
 };
 
-// Get all plans
 export const getAllPlans = async (_req: Request, res: Response) => {
     try {
         const plans = await PlanModel.findAll();
@@ -38,7 +36,6 @@ export const getAllPlans = async (_req: Request, res: Response) => {
     }
 };
 
-// Get plan by ID
 export const getPlanById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -57,7 +54,6 @@ export const getPlanById = async (req: Request, res: Response) => {
     }
 };
 
-// Update plan
 export const updatePlan = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -85,7 +81,6 @@ export const updatePlan = async (req: Request, res: Response) => {
     }
 };
 
-// Delete plan
 export const deletePlan = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;

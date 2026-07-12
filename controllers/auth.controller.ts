@@ -182,6 +182,7 @@ export const changePassword = async (req: AuthRequest, res: Response) => {
 
         return res.status(200).json({ message: "Password changed successfully" });
 
+
     } catch (error) {
         console.error("Change password error:", error);
         return res.status(500).json({ message: "Internal server error" });
