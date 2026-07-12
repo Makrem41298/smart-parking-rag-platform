@@ -64,11 +64,11 @@ export class Reclamation extends Model<ReclamationAttributes,ReclamationCreation
             allowNull: true,
         },
       content:{
-      type:  DataTypes.STRING,
+      type:  DataTypes.TEXT,
         allowNull: false,
       } ,
       solution: {
-        type:DataTypes.STRING,
+        type:DataTypes.TEXT,
         allowNull: true,
       },
         status: {

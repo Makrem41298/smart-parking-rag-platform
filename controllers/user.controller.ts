@@ -6,7 +6,6 @@ import {Op} from "sequelize";
 import bcrypt from "bcrypt";
 
 
-// Get all users
 export const getAllUsers = async (_req: AuthRequest, res: Response) => {
     try {
 
@@ -25,7 +24,6 @@ export const getAllUsers = async (_req: AuthRequest, res: Response) => {
     }
 };
 
-// Get user by ID
 export const getUserById = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;
@@ -63,7 +61,6 @@ export const getUserById = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// Update user
 export const updateUser = async (req: AuthRequest, res: Response) => {
     try {
         const { id } = req.params;

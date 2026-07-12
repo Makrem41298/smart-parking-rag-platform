@@ -4,7 +4,6 @@ import { ParkingStatus } from "../models/enum.type";
 import { TarifGridModel } from "../models/tarifGrid.model";
 import {PlanParkingLotModel} from "../models/planParkingLot.model";
 
-// Create a parking lot
 export const createParkingLot = async (req: Request, res: Response) => {
     try {
         const {
@@ -60,7 +59,6 @@ export const createParkingLot = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
-// Get all parking lots
 export const getAllParkingLots = async (_req: Request, res: Response) => {
     try {
         const parkings = await ParkingLots.findAll({
@@ -74,7 +72,6 @@ export const getAllParkingLots = async (_req: Request, res: Response) => {
     }
 };
 
-// Get parking lot by ID
 export const getParkingLotById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -95,7 +92,6 @@ export const getParkingLotById = async (req: Request, res: Response) => {
     }
 };
 
-// Update parking lot
 export const updateParkingLot = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
@@ -159,7 +155,6 @@ export const updateParkingLot = async (req: Request, res: Response) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 };
-// Delete parking lot
 export const deleteParkingLot = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;

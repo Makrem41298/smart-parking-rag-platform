@@ -142,6 +142,7 @@ export const agentAnonymousResponse = async (req: AuthRequest, res: Response) =>
                 sessionId:sessionId
             },
         );
+        console.log(response.data)
 
         return res.status(200).json(response.data);
 
